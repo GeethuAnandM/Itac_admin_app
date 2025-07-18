@@ -1,0 +1,2215 @@
+import 'package:admin_app/api/api.dart';
+import 'package:admin_app/screens/tripScreens/oneWayPage.dart';
+import 'package:admin_app/screens/themes.dart';
+import 'package:dio/dio.dart';
+import 'package:dropdown_search/dropdown_search.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+// import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../custom_widget.dart';
+import 'managetripscreen.dart';
+
+class RoundTrip extends StatefulWidget {
+  @override
+  State<RoundTrip> createState() => _RoundTripState();
+}
+
+class _RoundTripState extends State<RoundTrip> {
+  final _FormKey = GlobalKey<FormState>();
+  bool Isloading = false;
+  final storage = const FlutterSecureStorage();
+  var message = "";
+  var VehicleList = [];
+  var DeviceList = [];
+  List<dynamic> allids = [];
+  var dio = Dio();
+  VehicleDrop? vehicleNameselected;
+  List<VehicleDrop> totVehicle = [];
+  List<Trips> totTrip = [];
+  Trips? drivernames;
+  bool isDriverName = false;
+
+  Future<List<dynamic>> getVehiclesDetails() async {
+    final prefs = await SharedPreferences.getInstance();
+    var userId = prefs.getString("user_id");
+    final url = "${baseUrl}api/list-vehicles/$userId";
+    var dio = Dio();
+    final response = await dio.get(url);
+    VehicleList = response.data;
+    allids = [];
+    for (var i in VehicleList) {
+      if (i['deviceId'] != null && i['deviceId'] != "") {
+        allids.add(i['deviceId']);
+      }
+    }
+    return VehicleList;
+  }
+
+  Future<List<dynamic>> getDeviceCurrentLocation() async {
+    var data = {"deviceIds": allids};
+    const url2 = "${baseUrl}location/getDeviceCurrentLocation";
+    final response = await dio.post(url2, data: data);
+    DeviceList = await response.data;
+    return DeviceList;
+  }
+
+  List<Widget> AddVehicleNames() {
+    var dIds = [];
+    var vDids = [];
+    for (var i in DeviceList) {
+      dIds.add(i["id"]);
+    }
+    // print("inside addvehicles, device list :${dIds}");
+    for (var i in VehicleList) {
+      vDids.add(i['deviceId']);
+    }
+    // print("inside addvehicles, vehicles list${vDids}");
+    totVehicle.clear();
+    for (var i = 0; i < VehicleList.length; i++) {
+      // print(VehicleList[i]);
+      for (var j = 0; j < DeviceList.length; j++) {
+        // print(DeviceList[j]);
+        if (DeviceList[j]["id"] == VehicleList[i]["deviceId"]) {
+          print("hello");
+          totVehicle.add(
+            VehicleDrop(
+                VehicleList[i]["vehicleId"], VehicleList[i]["vehicleName"]),
+          );
+        }
+      }
+    }
+    // print(totVehicle);
+    setState(() {});
+
+    List<Widget> Demo = [];
+    return Demo;
+  }
+
+  bool _value = false;
+  int val = 0;
+  var submitbutton = false;
+  var errormessage = '';
+  var vehicleadded = false;
+
+  // Future chkdrivername(dynamic drivername) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   var userId = prefs.getString("user_id");
+  //   var orgId = prefs.getString("org_id");
+  //   final url = "$baseUrl:11022/api/list-driver/$orgId";
+  //   var dio = Dio();
+  //   final response = await dio.get(url);
+  //   // print("reschk${response.data}");
+  //   var fullname = "";
+  //   totTrip.clear();
+  //   for (var i = 0; i < response.data.length; i++) {
+  //     response.data[i]['firstName'] == null ||
+  //             response.data[i]['firstName'] == ''
+  //         ? fullname = ""
+  //         : fullname = response.data[i]['firstName'];
+  //     response.data[i]['middleName'] == null ||
+  //             response.data[i]['middleName'] == ''
+  //         ? fullname = fullname + ""
+  //         : fullname = fullname + " " + response.data[i]['middleName'];
+  //     response.data[i]['lastName'] == null || response.data[i]['lastName'] == ''
+  //         ? fullname = fullname + ""
+  //         : fullname = fullname + " " + response.data[i]['lastName'];
+  //     print("driver details $fullname");
+  //     if (fullname == drivername) {
+  //       driverNameController.text = fullname;
+  //       setState(() {
+  //         driverNameController.text = fullname;
+  //         // EasyLoading.dismiss();
+  //       });
+  //       totTrip.add(Trips(
+  //         response.data[i]['driverId'],
+  //         fullname,
+  //       ));
+  //     }
+  //   }
+  //   return null;
+  // }
+
+  List<Map<dynamic, dynamic>> driverlist = [];
+  Future<List<dynamic>> getdata() async {
+    final prefs = await SharedPreferences.getInstance();
+    var userId = prefs.getString("user_id");
+    var orgId = prefs.getString("org_id");
+    final url = "${baseUrl}api/list-driver/$orgId";
+    var dio = Dio();
+    final response = await dio.get(url);
+    driverlist.clear();
+    // print("res${response.data}");
+    var fullname = "";
+    for (var i = 0; i < response.data.length; i++) {
+      if (response.data[i]['vehicleId'] == vehicleNameselected?.id) {
+        response.data[i]['firstName'] == null ||
+                response.data[i]['firstName'] == ''
+            ? fullname = ""
+            : fullname = response.data[i]['firstName'];
+        response.data[i]['middleName'] == null ||
+                response.data[i]['middleName'] == ''
+            ? fullname = fullname + ""
+            : fullname = fullname + " " + response.data[i]['middleName'];
+        response.data[i]['lastName'] == null ||
+                response.data[i]['lastName'] == ''
+            ? fullname = fullname + ""
+            : fullname = fullname + " " + response.data[i]['lastName'];
+        // print("driver details $fullname");
+        driverNameController.text = fullname;
+        isDriverName = true;
+      }
+    }
+
+    setState(() {
+      isDriverName = isDriverName;
+      driverNameController.text = fullname;
+      // EasyLoading.dismiss();
+    });
+    // print(" data is here $driverlist");
+    // print('length:${driverlist.length}');
+    // print(driverlist.runtimeType);
+    return driverlist;
+  }
+
+  Future getdriverName() async {
+    print("getdrivername");
+    final prefs = await SharedPreferences.getInstance();
+    var userId = prefs.getString("user_id");
+    var orgId = prefs.getString("org_id");
+    final url = "${baseUrl}api/list-driver/$orgId";
+    var dio = Dio();
+    final response = await dio.get(url);
+    // print("reschk${response.data}");
+    var fullname = "";
+    totTrip.clear();
+    for (var i = 0; i < response.data.length; i++) {
+      response.data[i]['firstName'] == null ||
+              response.data[i]['firstName'] == ''
+          ? fullname = ""
+          : fullname = response.data[i]['firstName'];
+      response.data[i]['middleName'] == null ||
+              response.data[i]['middleName'] == ''
+          ? fullname = fullname + ""
+          : fullname = fullname + " " + response.data[i]['middleName'];
+      response.data[i]['lastName'] == null || response.data[i]['lastName'] == ''
+          ? fullname = fullname + ""
+          : fullname = fullname + " " + response.data[i]['lastName'];
+      // print("driver details $fullname");
+      totTrip.add(Trips(
+        response.data[i]['driverId'],
+        fullname,
+      ));
+    }
+    setState(() {
+      Isloading = false;
+    });
+    return null;
+  }
+
+  bool iserrortext = false;
+  String errormsg = "";
+  addTripDetails(
+      {var vehicleName,
+      tripName,
+      recurring,
+      drivername,
+      enddate,
+      onwardstartdate,
+      onwardstarttime,
+      onwardenddata,
+      onwardendtime,
+      returnstartdate,
+      returnstarttime,
+      returnenddate,
+      returnendtime}) async {
+    String? orgId = await storage.read(key: "org_ids") ??
+        await storage.read(key: "temp_org_ids");
+    // print("org_id $orgId");
+    setState(() {
+      submitbutton = true;
+      // EasyLoading.show(status: "Loading");
+    });
+    var onwardstartdatetochk = DateTime.parse(onwardstartdate);
+    var onwardenddateexpected = onwardstartdatetochk.add(Duration(hours: 24));
+    var onwardenddategot = DateTime.parse(onwardenddata);
+    print(
+        "$vehicleName,$tripName,$recurring,${drivernames},$enddate,$onwardstartdate,$onwardstarttime,$onwardendtime,$onwardenddata");
+    var data;
+    DateTime onwardStartTimeformat = DateFormat("HH:mm").parse(onwardstarttime).subtract(const Duration(hours: 5,minutes: 30));
+    DateTime onwardendtimeformat = DateFormat("HH:mm").parse(onwardendtime).subtract(const Duration(hours: 5,minutes: 30));
+    DateTime returnstarttimeformat = DateFormat("HH:mm").parse(returnstarttime).subtract(const Duration(hours: 5,minutes: 30));
+    DateTime returnendtimeformat = DateFormat("HH:mm").parse(returnendtime).subtract(const Duration(hours: 5,minutes: 30));
+    if (recurring == false) {
+      data = {
+        "isRecurring": recurring,
+        "category": "Round",
+        // "endDate": enddate,
+        "onwardEndDate": onwardenddata,
+        "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+        "onwardStartDate": onwardstartdate,
+        "onwardStartTime": DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+        "returnStartDate": returnstartdate,
+        "returnStartTime":DateFormat("HH:mm").format(returnstarttimeformat) + ":00" ,
+        "returnEndDate": returnenddate,
+        "returnEndTime": DateFormat("HH:mm").format(returnendtimeformat) + ":00",
+        "orgId": int.parse(orgId!),
+        "vehicleId":
+            vehicleNameselected == null ? null : vehicleNameselected?.id,
+        "driverId": drivernames == null ? null : drivernames?.id,
+        "status": "Not Started",
+        "tripName": tripName
+      };
+    } else {
+      if (enddate == null) {
+        setState(() {
+          errormessage = "end date is required";
+        });
+      } else {
+        data = {
+          "isRecurring": recurring,
+          "category": "Round",
+          "endDate": enddate,
+          "onwardEndDate": onwardenddata,
+          "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+          "onwardStartDate": onwardstartdate,
+          "onwardStartTime":DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+          "returnStartDate": returnstartdate,
+          "returnStartTime": DateFormat("HH:mm").format(returnstarttimeformat) + ":00" ,
+          "returnEndDate": returnenddate,
+          "returnEndTime": DateFormat("HH:mm").format(returnendtimeformat) + ":00",
+          "orgId": int.parse(orgId!),
+          "vehicleId": vehicleNameselected == null ? null : vehicleNameselected?.id,
+          "driverId": drivernames == null ? null : drivernames?.id,
+          "status": "Not Started",
+          "tripName": tripName
+        };
+      }
+    }
+
+    print(data);
+    const url2 = "${baseUrl}trips/save-trip";
+    var vehLocationList = [];
+    try {
+      print("in try  section");
+      var dio = Dio();
+      final response = await dio.post(url2, data: data);
+      print(response.statusCode);
+      print(response.data);
+      print(response.statusCode);
+      showSnackBar(context, "Trip added Succesfully");
+      setState(() {
+        // submitbutton= false;
+        errormessage = "Trip added Succesfully";
+        vehicleadded = true;
+      });
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => manageTripScreen()),
+        );
+      }
+    } on DioError catch (e) {
+      if (e.response?.statusCode == 400) {
+        showSnackBar(context, e.response?.data["message"]);
+      } else if (e.response?.statusCode == 404) {
+        showSnackBar(context, "Something Went Wrong");
+      } else if (e.response?.statusCode == 500) {
+        showSnackBar(context, "Server Error");
+      }
+    }
+    // return vehLocationList;
+    // } catch (e) {
+    //   print(e);
+    //   print("some error occured");
+    // }
+  }
+
+  final endDateController = TextEditingController();
+  final returnEndDateController = TextEditingController();
+  final returnstartTimeController = TextEditingController();
+  final returnStartDateController = TextEditingController();
+  final vehicleNameController = TextEditingController();
+  final driverNameController = TextEditingController();
+  final onwardStartDateController = TextEditingController();
+  final onwardstartTimeController = TextEditingController();
+  final onwardEndDateController = TextEditingController();
+  final onwardEndTimeController = TextEditingController();
+  final returnEndTimeController = TextEditingController();
+  final tripNameController = TextEditingController();
+
+  @override
+  void initState() {
+    () async {
+      Isloading = true;
+      await getVehiclesDetails();
+      await getDeviceCurrentLocation();
+      await AddVehicleNames();
+      await getdriverName();
+    }();
+    super.initState();
+  }
+
+  Future<List<VehicleDrop>> filterdata(filter) async {
+    var res =
+        totVehicle.where((element) => element.name.contains(filter)).toList();
+    return res;
+  }
+
+  Future<List<Trips>> filterTrip(filter) async {
+    var res =
+        totTrip.where((element) => element.name.contains(filter)).toList();
+    return res;
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
+  Widget build(BuildContext context) {
+    print(_value);
+    return Scaffold(
+      body: Isloading == true
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Column(children: [
+                Container(
+                    child: Image.asset('images/addtrip.jpg',
+                        height: 200, width: 360, fit: BoxFit.cover)),
+                Container(
+                  margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomRight,
+                        colors: [Colors.white54, Colors.white54]),
+                    borderRadius:
+                        const BorderRadius.vertical(top: Radius.circular(30)),
+                    boxShadow: [
+                      BoxShadow(
+                        offset: const Offset(0, 1),
+                        blurRadius: 4,
+                        color: Colors.black.withOpacity(0.2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Form(
+                      key: _FormKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .03,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                child: Image.asset(
+                                  'images/adminimage6.png',
+                                  color: commonTextStyle,
+                                  width: 40,
+                                  height: 36,
+                                  fit: BoxFit.fill,
+                                ),
+                                decoration: const BoxDecoration(
+                                    color: blueColor,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(5))),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    controller: tripNameController,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    keyboardType: TextInputType.text,
+                                    autofocus: false,
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter Trip Name';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("Trip Name"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "Trip Name",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          const Text(
+                            "Onward",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 20),
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.date_range_sharp,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter Start Date';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else {
+                                      //     DateTime? pickedDate =
+                                      //     await showDatePicker(
+                                      //         context: context,
+                                      //         initialDate: DateTime.now()
+                                      //             .add(const Duration(
+                                      //             hours: 24)),
+                                      //         firstDate: DateTime.now().add(
+                                      //             const Duration(
+                                      //                 hours: 24)),
+                                      //         lastDate: DateTime.parse(
+                                      //             endDateController.text));
+                                      //     if (pickedDate != null) {
+                                      //       print(
+                                      //           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                      //       String formattedDate =
+                                      //       DateFormat('yyyy-MM-dd')
+                                      //           .format(pickedDate);
+                                      //       print(formattedDate);
+                                      //       setState(() {
+                                      //         onwardStartDateController.text =
+                                      //             formattedDate.toString();
+                                      //       });
+                                      //     } else {
+                                      //       return null;
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      DateTime? pickedDate =
+                                          await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime.now()
+                                            .add(const Duration(days: 320)),
+                                      );
+                                      if (pickedDate != null) {
+                                        print(
+                                            pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                        String formattedDate =
+                                            DateFormat('yyyy-MM-dd')
+                                                .format(pickedDate);
+                                        print(formattedDate);
+                                        setState(() {
+                                          onwardStartDateController.text =
+                                              formattedDate.toString();
+                                        });
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    // },
+                                    controller: onwardStartDateController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("Start Date"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "Start Date",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.timelapse,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter Start Time';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else {
+                                      //     final TimeOfDay? newTime =
+                                      //     await showTimePicker(
+                                      //       context: context,
+                                      //       initialTime: TimeOfDay.now(),
+                                      //     );
+                                      //     print(newTime);
+                                      //     if (newTime != null) {
+                                      //       print(newTime);
+                                      //       DateTime parsedTime =
+                                      //       DateFormat.jm().parse(newTime
+                                      //           .format(context)
+                                      //           .toString());
+                                      //       String formattedTime =
+                                      //       DateFormat('HH:mm:ss')
+                                      //           .format(parsedTime);
+                                      //       print(formattedTime);
+                                      //       setState(() {
+                                      //         onwardstartTimeController.text =
+                                      //             formattedTime;
+                                      //         print(newTime);
+                                      //       });
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else {
+                                        final TimeOfDay? newTime =
+                                            await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.now(),
+                                        );
+                                        print(newTime);
+                                        if (newTime != null) {
+                                          print(newTime);
+                                          DateTime parsedTime = DateFormat.jm()
+                                              .parse(newTime
+                                                  .format(context)
+                                                  .toString());
+                                          String formattedTime =
+                                              DateFormat('HH:mm:ss')
+                                                  .format(parsedTime);
+                                          print(formattedTime);
+                                          setState(() {
+                                            onwardstartTimeController.text =
+                                                formattedTime;
+                                            print(newTime);
+                                          });
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: onwardstartTimeController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("Start Time"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "Start Time",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_month,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter End Date';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else {
+                                      //     DateTime? pickedDate =
+                                      //     await showDatePicker(
+                                      //       context: context,
+                                      //       initialDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       firstDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       lastDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //     );
+                                      //     if (pickedDate != null) {
+                                      //       print(
+                                      //           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                      //       String formattedDate =
+                                      //       DateFormat('yyyy-MM-dd')
+                                      //           .format(pickedDate);
+                                      //       print(formattedDate);
+                                      //       setState(() {
+                                      //         onwardEndDateController.text =
+                                      //             formattedDate.toString();
+                                      //       });
+                                      //     } else {
+                                      //       return;
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Start Time First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else {
+                                        DateTime? pickedDate =
+                                            await showDatePicker(
+                                          context: context,
+                                          initialDate:
+                                              onwardStartDateController.text !=
+                                                      ""
+                                                  ? DateTime.parse(
+                                                      onwardStartDateController
+                                                          .text)
+                                                  : DateTime.now(),
+                                          firstDate:
+                                              onwardStartDateController.text !=
+                                                      ""
+                                                  ? DateTime.parse(
+                                                      onwardStartDateController
+                                                          .text)
+                                                  : DateTime.now(),
+                                          lastDate: DateTime.now()
+                                              .add(Duration(days: 320)),
+                                        );
+                                        if (pickedDate != null) {
+                                          print(
+                                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                          String formattedDate =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(pickedDate);
+                                          print(formattedDate);
+                                          setState(() {
+                                            onwardEndDateController.text =
+                                                formattedDate.toString();
+                                          });
+                                        } else {
+                                          return;
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: onwardEndDateController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("End Date"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "End Date",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.timelapse,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter End Time';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else if (onwardstartTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Time First");
+                                      //   } else if (onwardEndDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Date First");
+                                      //   } else {
+                                      //     final TimeOfDay? newTime =
+                                      //     await showTimePicker(
+                                      //       context: context,
+                                      //       initialTime: TimeOfDay.now(),
+                                      //     );
+                                      //     print(newTime);
+                                      //     if (newTime != null) {
+                                      //       print(newTime);
+                                      //       DateTime parsedTime =
+                                      //       DateFormat.jm().parse(newTime
+                                      //           .format(context)
+                                      //           .toString());
+                                      //
+                                      //       String formattedTime =
+                                      //       DateFormat('HH:mm:ss')
+                                      //           .format(parsedTime);
+                                      //       print(formattedTime);
+                                      //       setState(() {
+                                      //         onwardEndTimeController.text =
+                                      //             formattedTime.toString();
+                                      //       });
+                                      //     } else {
+                                      //       return;
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Time First");
+                                      } else if (onwardEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else {
+                                        final TimeOfDay? newTime =
+                                            await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.now(),
+                                        );
+                                        print(newTime);
+                                        if (newTime != null) {
+                                          print(newTime);
+                                          DateTime parsedTime = DateFormat.jm()
+                                              .parse(newTime
+                                                  .format(context)
+                                                  .toString());
+                                          String formattedTime =
+                                              DateFormat('HH:mm:ss')
+                                                  .format(parsedTime);
+                                          print(formattedTime);
+                                          setState(() {
+                                            onwardEndTimeController.text =
+                                                formattedTime.toString();
+                                          });
+                                        } else {
+                                          return;
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: onwardEndTimeController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("End Time"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "End Time",
+                                      border: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          const Divider(
+                            thickness: 5,
+                            color: blueColor,
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          const Text(
+                            "Return",
+                            style: TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 20),
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.date_range_sharp,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter Start Date';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else if (onwardstartTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Time First");
+                                      //   } else if (onwardEndDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Date First");
+                                      //   } else if (onwardEndTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Time First");
+                                      //   } else {
+                                      //     DateTime? pickedDate =
+                                      //     await showDatePicker(
+                                      //       context: context,
+                                      //       initialDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       firstDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       lastDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //     );
+                                      //     if (pickedDate != null) {
+                                      //       print(
+                                      //           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                      //       String formattedDate =
+                                      //       DateFormat('yyyy-MM-dd')
+                                      //           .format(pickedDate);
+                                      //       print(formattedDate);
+                                      //       setState(() {
+                                      //         returnStartDateController.text =
+                                      //             formattedDate.toString();
+                                      //       });
+                                      //     } else {
+                                      //       return;
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Time First");
+                                      } else if (onwardEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else if (onwardEndTimeController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Time First");
+                                      } else {
+                                        DateTime? pickedDate =
+                                            await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.parse(
+                                              onwardEndDateController.text),
+                                          firstDate: DateTime.parse(
+                                              onwardEndDateController.text),
+                                          lastDate: DateTime.now()
+                                              .add(Duration(days: 320)),
+                                        );
+                                        if (pickedDate != null) {
+                                          print(
+                                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                          String formattedDate =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(pickedDate);
+                                          print(formattedDate);
+                                          setState(() {
+                                            returnStartDateController.text =
+                                                formattedDate.toString();
+                                          });
+                                        } else {
+                                          return null;
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: returnStartDateController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("Start Date"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "Start Date",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.timelapse,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter Start Time';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else if (onwardstartTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Time First");
+                                      //   } else if (onwardEndDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Date First");
+                                      //   } else if (onwardEndTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Time First");
+                                      //   } else if (returnStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the start date First");
+                                      //   } else {
+                                      //     final TimeOfDay? newTime =
+                                      //     await showTimePicker(
+                                      //       context: context,
+                                      //       initialTime: TimeOfDay.now(),
+                                      //     );
+                                      //     print(newTime);
+                                      //     if (newTime != null) {
+                                      //       print(newTime);
+                                      //       DateTime parsedTime =
+                                      //       DateFormat.jm().parse(newTime
+                                      //           .format(context)
+                                      //           .toString());
+                                      //       String formattedTime =
+                                      //       DateFormat('HH:mm:ss')
+                                      //           .format(parsedTime);
+                                      //       print(formattedTime);
+                                      //       setState(() {
+                                      //         returnstartTimeController.text =
+                                      //             formattedTime;
+                                      //         print(newTime);
+                                      //       });
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Time First");
+                                      } else if (onwardEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else if (onwardEndTimeController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Time First");
+                                      } else if (returnStartDateController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the start date First");
+                                      } else {
+                                        final TimeOfDay? newTime =
+                                            await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.now(),
+                                        );
+                                        print(newTime);
+                                        if (newTime != null) {
+                                          print(newTime);
+                                          DateTime parsedTime = DateFormat.jm()
+                                              .parse(newTime
+                                                  .format(context)
+                                                  .toString());
+                                          String formattedTime =
+                                              DateFormat('HH:mm:ss')
+                                                  .format(parsedTime);
+                                          print(formattedTime);
+                                          setState(() {
+                                            returnstartTimeController.text =
+                                                formattedTime;
+                                            print(newTime);
+                                          });
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: returnstartTimeController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("Start Time"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "Start Time",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.calendar_month,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                // height: MediaQuery.of(context).size.height * .07 ,
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter End Date';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      // if (_value == true) {
+                                      //   if (endDateController.text == "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Recurring Date First");
+                                      //   } else if (onwardStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Date First");
+                                      //   } else if (onwardstartTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the Starting Time First");
+                                      //   } else if (onwardEndDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Date First");
+                                      //   } else if (onwardEndTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the End Time First");
+                                      //   } else if (returnStartDateController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the start date First");
+                                      //   } else if (returnstartTimeController
+                                      //       .text ==
+                                      //       "") {
+                                      //     showSnackBar(context,
+                                      //         "Please Pick the start Time First");
+                                      //   } else {
+                                      //     DateTime? pickedDate =
+                                      //     await showDatePicker(
+                                      //       context: context,
+                                      //       initialDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       firstDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //       lastDate: DateTime.parse(
+                                      //           endDateController.text),
+                                      //     );
+                                      //     if (pickedDate != null) {
+                                      //       print(
+                                      //           pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                      //       String formattedDate =
+                                      //       DateFormat('yyyy-MM-dd')
+                                      //           .format(pickedDate);
+                                      //       print(formattedDate);
+                                      //       setState(() {
+                                      //         returnEndDateController.text =
+                                      //             formattedDate.toString();
+                                      //       });
+                                      //     } else {
+                                      //       return;
+                                      //     }
+                                      //   }
+                                      // } else {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Time First");
+                                      } else if (onwardEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else if (onwardEndTimeController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Time First");
+                                      } else if (returnStartDateController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the start date First");
+                                      } else if (returnstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the start Time First");
+                                      } else {
+                                        DateTime? pickedDate =
+                                            await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.parse(
+                                              returnStartDateController.text),
+                                          firstDate: DateTime.parse(
+                                              returnStartDateController.text),
+                                          lastDate: DateTime.now()
+                                              .add(Duration(days: 320)),
+                                        );
+                                        if (pickedDate != null) {
+                                          print(
+                                              pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                          String formattedDate =
+                                              DateFormat('yyyy-MM-dd')
+                                                  .format(pickedDate);
+                                          print(formattedDate);
+                                          setState(() {
+                                            returnEndDateController.text =
+                                                formattedDate.toString();
+                                          });
+                                        } else {
+                                          return null;
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: returnEndDateController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    readOnly: true,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("End Date"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "End Date",
+                                      border: new OutlineInputBorder(
+                                        borderSide:
+                                            new BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.timelapse,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                width: MediaQuery.of(context).size.width * .82,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: Center(
+                                  child: TextFormField(
+                                    validator: (value) {
+                                      if (value!.isEmpty) {
+                                        return 'Enter End Time';
+                                      } else {
+                                        return null;
+                                      }
+                                    },
+                                    onTap: () async {
+                                      if (onwardStartDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Date First");
+                                      } else if (onwardstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the Starting Time First");
+                                      } else if (onwardEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else if (onwardEndTimeController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Time First");
+                                      } else if (returnStartDateController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the start date First");
+                                      } else if (returnstartTimeController
+                                              .text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the start Time First");
+                                      } else if (returnEndDateController.text ==
+                                          "") {
+                                        showSnackBar(context,
+                                            "Please Pick the End Date First");
+                                      } else {
+                                        final TimeOfDay? newTime =
+                                            await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.now(),
+                                        );
+                                        print(newTime);
+                                        if (newTime != null) {
+                                          print(newTime);
+                                          DateTime parsedTime = DateFormat.jm()
+                                              .parse(newTime
+                                                  .format(context)
+                                                  .toString());
+                                          String formattedTime =
+                                              DateFormat('HH:mm:ss')
+                                                  .format(parsedTime);
+                                          print(formattedTime);
+                                          setState(() {
+                                            returnEndTimeController.text =
+                                                formattedTime.toString();
+                                          });
+                                        } else {
+                                          return;
+                                        }
+                                      }
+                                    },
+                                    // },
+                                    controller: returnEndTimeController,
+                                    keyboardType: TextInputType.none,
+                                    autofocus: false,
+                                    decoration: InputDecoration(
+                                      label: Row(
+                                        children: const [
+                                          Text("End Time"),
+                                          Padding(
+                                            padding: EdgeInsets.all(3.0),
+                                          ),
+                                          Text('*',
+                                              style:
+                                                  TextStyle(color: Colors.red)),
+                                        ],
+                                      ),
+                                      hintText: "End Time",
+                                      border: OutlineInputBorder(
+                                        borderSide: const BorderSide(
+                                            color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
+                                      ),
+                                      hintStyle: const TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                      errorBorder: UnderlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(7.0),
+                                        borderSide: const BorderSide(
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(children: [
+                            const SizedBox(
+                              width: 50,
+                            ),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 2, 0),
+                              width: MediaQuery.of(context).size.width * .8,
+                              decoration: BoxDecoration(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              child: DropdownButtonFormField<String>(
+                                // validator: (value) => value == null
+                                //     ? "Select a Recurring Date"
+                                //     : null,
+                                // value: vehicleNameselected,
+                                hint: Text(
+                                  'Is Recurring',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                elevation: 16,
+                                iconSize: 20,
+                                icon: const Icon(Icons.arrow_drop_down),
+                                isDense: true,
+                                decoration: InputDecoration(
+                                  label: Row(
+                                    children: [Text("Is Recurring")],
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onChanged: (String? newValue) async {
+                                  if (newValue == "No") {
+                                    setState(() {
+                                      _value = false;
+                                      // print("_value:${_value}");
+                                    });
+                                  } else {
+                                    setState(() {
+                                      _value = true;
+                                    });
+                                  }
+                                  setState(() {
+                                    dropdownValue = newValue!;
+                                  });
+                                },
+                                items: <String>[
+                                  'No',
+                                  'Yes'
+                                ].map<DropdownMenuItem<String>>((String value) {
+                                  // print("value:${value}");
+                                  return DropdownMenuItem<String>(
+                                    value: value,
+                                    child: Center(
+                                        child: Text(
+                                      value,
+                                      style: TextStyle(fontSize: 17),
+                                    )),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ]),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          _value == true
+                              ? Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.update,
+                                      size: 40,
+                                      color: blueColor,
+                                    ),
+                                    Container(
+                                      margin:
+                                          const EdgeInsets.fromLTRB(0, 0, 3, 0),
+                                      padding: const EdgeInsets.fromLTRB(
+                                          10, 0, 0, 0),
+                                      width: MediaQuery.of(context).size.width *
+                                          .82,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Center(
+                                        child: TextFormField(
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return 'Enter recurring Date';
+                                            } else {
+                                              return null;
+                                            }
+                                          },
+                                          onTap: () async {
+                                            DateTime? pickedDate =
+                                                await showDatePicker(
+                                              context: context,
+                                              // initialDate: DateTime.now(),
+                                              // firstDate: DateTime.now(),
+                                              // lastDate: DateTime.now().add(
+                                              //     const Duration(days: 320)),
+                                              initialDate: DateTime.parse(
+                                                      returnEndDateController
+                                                          .text)
+                                                  .add(Duration(hours: 24)),
+                                              firstDate: DateTime.parse(
+                                                      returnEndDateController
+                                                          .text)
+                                                  .add(Duration(hours: 24)),
+                                              lastDate: DateTime.now()
+                                                  .add(Duration(days: 320)),
+                                            );
+                                            if (pickedDate != null) {
+                                              print(
+                                                  pickedDate); //pickedDate output format => 2021-03-10 00:00:00.000
+                                              String formattedDate =
+                                                  DateFormat('yyyy-MM-dd')
+                                                      .format(pickedDate);
+                                              print(formattedDate);
+                                              setState(() {
+                                                endDateController.text =
+                                                    formattedDate.toString();
+                                              });
+                                            } else {
+                                              return null;
+                                            }
+                                          },
+                                          controller: endDateController,
+                                          keyboardType: TextInputType.none,
+                                          autofocus: false,
+                                          decoration: InputDecoration(
+                                            label: Row(
+                                              children: const [
+                                                Text("End Date"),
+                                                Padding(
+                                                  padding: EdgeInsets.all(3.0),
+                                                ),
+                                                Text('*',
+                                                    style: TextStyle(
+                                                        color: Colors.red)),
+                                              ],
+                                            ),
+                                            hintText: "End Date",
+                                            border: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                  color: Colors.black),
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                            ),
+                                            hintStyle: const TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w400),
+                                            errorBorder: UnderlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(7.0),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const SizedBox(),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(children: [
+                            Container(
+                              child: Image.asset(
+                                'images/caricontransparent.png',
+                                color: commonTextStyle,
+                                width: 40,
+                                height: 36,
+                                fit: BoxFit.fill,
+                              ),
+                              decoration: const BoxDecoration(
+                                  color: blueColor,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5))),
+                            ),
+                            Container(
+                                margin: const EdgeInsets.fromLTRB(10, 0, 2, 0),
+                                width: MediaQuery.of(context).size.width * .8,
+                                decoration: const BoxDecoration(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: DropdownSearch<VehicleDrop>(
+                                  dropdownDecoratorProps:
+                                      const DropDownDecoratorProps(
+                                          dropdownSearchDecoration:
+                                              InputDecoration(
+                                                  hintText:
+                                                      'Select Vehicle Name')),
+                                  popupProps: PopupProps.bottomSheet(
+                                      searchFieldProps: TextFieldProps(
+                                          decoration: InputDecoration(
+                                              hintText: "Select Vehicle Name")),
+                                      showSearchBox: true),
+                                  items: totVehicle,
+                                  // asyncItems: (String filter) =>
+                                  //     filterdata(filter),
+                                  onChanged: (VehicleDrop? data) async {
+                                    if (data != null) {
+                                      setState(() {
+                                        vehicleNameselected = data;
+
+                                        // EasyLoading.show(status: "Loading");
+                                      });
+                                      await getdata();
+
+                                      print(
+                                          "newvalue${vehicleNameselected?.id}");
+                                    }
+                                  },
+                                )),
+                          ]),
+                          // Container(
+                          //   margin: const EdgeInsets.fromLTRB(10, 0, 2, 0),
+                          //   width: MediaQuery.of(context).size.width * .8,
+                          //   decoration: const BoxDecoration(
+                          //       borderRadius:
+                          //           BorderRadius.all(Radius.circular(10))),
+                          //   child: DropdownSearch<String>(
+                          //     mode: Mode.DIALOG,
+                          //     showSearchBox: true,
+                          //     showSelectedItem: true,
+                          //     itemAsString: ,
+                          //     label: "Country",
+                          //     onChanged: print,
+                          //     //show selected item
+                          //     selectedItem: "India",
+                          //   ),
+                          // ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .02,
+                          ),
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.person,
+                                size: 40,
+                                color: blueColor,
+                              ),
+                              isDriverName == true
+                                  ? Container(
+                                      margin: const EdgeInsets.fromLTRB(
+                                          10, 0, 2, 0),
+                                      width: MediaQuery.of(context).size.width *
+                                          .8,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      child: Center(
+                                        child: TextFormField(
+                                          controller: driverNameController,
+                                          autovalidateMode: AutovalidateMode
+                                              .onUserInteraction,
+                                          keyboardType: TextInputType.text,
+                                          autofocus: false,
+                                          validator: (value) {
+                                            if (value!.isEmpty) {
+                                              return 'Enter Driver Name';
+                                            } else {
+                                              return null;
+                                            }
+                                          },
+                                          decoration: InputDecoration(
+                                            enabled: false,
+                                            label: Row(
+                                              children: const [
+                                                Text('*',
+                                                    style: TextStyle(
+                                                        color: Colors.red)),
+                                                Padding(
+                                                  padding: EdgeInsets.all(3.0),
+                                                ),
+                                                Text("Driver Name")
+                                              ],
+                                            ),
+                                            hintText: "Driver Name",
+                                            border: new OutlineInputBorder(
+                                              borderSide: new BorderSide(
+                                                  color: Colors.black),
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0),
+                                            ),
+                                            hintStyle: const TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.w400),
+                                            errorBorder: UnderlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(7.0),
+                                              borderSide: const BorderSide(
+                                                color: Colors.red,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  : Container(
+                                      margin: const EdgeInsets.fromLTRB(
+                                          10, 0, 2, 0),
+                                      width: MediaQuery.of(context).size.width *
+                                          .8,
+                                      decoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(10))),
+                                      // child: DropdownButtonFormField<Trips>(
+                                      //   // value: vehicleNameselected,
+                                      //   validator: (value) => value == null
+                                      //       ? "Select a Driver"
+                                      //       : null,
+                                      //   hint: const Text(
+                                      //     'Select DriverName',
+                                      //     style: TextStyle(fontSize: 12),
+                                      //   ),
+                                      //   elevation: 16,
+                                      //   iconSize: 20,
+                                      //   icon: const Icon(Icons.arrow_drop_down),
+                                      //   isDense: true,
+                                      //   decoration: InputDecoration(
+                                      //     label: Row(
+                                      //       children: const [
+                                      //         Text('*',
+                                      //             style: TextStyle(
+                                      //                 color: Colors.red)),
+                                      //         Padding(
+                                      //           padding: EdgeInsets.all(3.0),
+                                      //         ),
+                                      //         Text("Select DriverName")
+                                      //       ],
+                                      //     ),
+                                      //     border: OutlineInputBorder(
+                                      //       borderRadius:
+                                      //           BorderRadius.circular(10),
+                                      //     ),
+                                      //   ),
+                                      //   onChanged: (Trips? newValue) async {
+                                      //     if (newValue != null) {
+                                      //       setState(() {
+                                      //         drivernames = newValue;
+                                      //         // EasyLoading.show(status: "Loading");
+                                      //       });
+                                      //       print("newvalue${drivernames.id}");
+                                      //     }
+                                      //   },
+                                      //   items: totTrip.map((Trips value) {
+                                      //     // print("value:$value");
+                                      //     return DropdownMenuItem<Trips>(
+                                      //       value: value,
+                                      //       child: Text(value.name.toString()),
+                                      //     );
+                                      //   }).toList(),
+                                      // ),
+                                      child: DropdownSearch<Trips>(
+                                        dropdownDecoratorProps:
+                                            const DropDownDecoratorProps(
+                                                dropdownSearchDecoration:
+                                                    InputDecoration(
+                                                        hintText:
+                                                            'Select Driver Name')),
+                                        popupProps: PopupProps.bottomSheet(
+                                            searchFieldProps: TextFieldProps(
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        "Select Driver Name")),
+                                            showSearchBox: true),
+                                        items: totTrip,
+                                        // asyncItems: (String filter) =>
+                                        //     filterTrip(filter),
+                                        onChanged: (Trips? data) async {
+                                          if (data != null) {
+                                            setState(() {
+                                              drivernames = data;
+                                              // EasyLoading.show(status: "Loading");
+                                            });
+                                            // await getdata();
+                                            // print("newvalue${drivernames?.id}");
+                                          }
+                                        },
+                                      )),
+                            ],
+                          ),
+
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * .05,
+                          ),
+                          Container(
+                              child: CustomButton(
+                                  buttontext: "Submit",
+                                  onpress: () async {
+                                    print("hello");
+                                    var add;
+                                    if (_FormKey.currentState!.validate()) {
+                                      if (_value == true) {
+                                        add = await addTripDetails(
+                                            drivername:
+                                                drivernames?.name == null
+                                                    ? null
+                                                    : drivernames?.name,
+                                            vehicleName: vehicleNameselected
+                                                ?.name
+                                                .toString(),
+                                            recurring: _value,
+                                            tripName: tripNameController.text,
+                                            onwardstartdate:
+                                                onwardStartDateController.text,
+                                            onwardstarttime:
+                                                onwardstartTimeController.text,
+                                            enddate: endDateController.text,
+                                            onwardenddata:
+                                                onwardEndDateController.text,
+                                            onwardendtime:
+                                                onwardEndTimeController.text,
+                                            returnstartdate:
+                                                returnStartDateController.text,
+                                            returnstarttime:
+                                                returnstartTimeController.text,
+                                            returnenddate:
+                                                returnEndDateController.text,
+                                            returnendtime:
+                                                returnEndTimeController.text);
+                                      } else {
+                                        print("hai");
+                                        add = await addTripDetails(
+                                            drivername: drivernames,
+                                            vehicleName: vehicleNameselected
+                                                ?.name
+                                                .toString(),
+                                            recurring: _value,
+                                            tripName: tripNameController.text,
+                                            onwardstartdate:
+                                                onwardStartDateController.text,
+                                            onwardstarttime:
+                                                onwardstartTimeController.text,
+                                            // enddate: endDateController.text,
+                                            onwardenddata:
+                                                onwardEndDateController.text,
+                                            onwardendtime:
+                                                onwardEndTimeController.text,
+                                            returnstartdate:
+                                                returnStartDateController.text,
+                                            returnstarttime:
+                                                returnstartTimeController.text,
+                                            returnenddate:
+                                                returnEndDateController.text,
+                                            returnendtime:
+                                                returnEndTimeController.text);
+                                      }
+                                      print(
+                                          "returndate${returnEndDateController.text}");
+                                      print(
+                                          "returntime${returnEndTimeController.text}");
+                                    }
+                                  })),
+                          // SizedBox(
+                          //   height: MediaQuery.of(context).size.height * .025,
+                          // ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(15, 35, 15, 10),
+                            child: Center(
+                              child: GestureDetector(
+                                  onTap: () async {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          manageTripScreen(),
+                                    ));
+                                    //   // (route) => false,
+                                    // );
+                                    // Navigator.pop(context);
+                                  },
+                                  child: Text("Back to Tripscreen?",
+                                      textAlign: TextAlign.center,
+                                      style: blueColouredTextStyle)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+    );
+  }
+
+  void showSnackBar(BuildContext context, String title) {
+    final snackBar = SnackBar(
+      content: Text(title),
+      margin: EdgeInsets.only(
+        bottom: 450,
+        right: 20,
+        left: 20,
+      ),
+      backgroundColor: Colors.blue,
+      behavior: SnackBarBehavior.floating,
+      action: SnackBarAction(
+        label: 'Dismiss',
+        disabledTextColor: Colors.white,
+        textColor: Colors.yellow,
+        onPressed: () {
+          //Do whatever you want
+        },
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+}

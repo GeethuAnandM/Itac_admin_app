@@ -1,0 +1,26 @@
+{
+"dashBoard":"Tableau de bord",
+  "tracking": "Pistage",
+  "location":"Emplacement-Clusterisé",
+  "trips": "Voyages",
+  "tripsOverview": "Aperçu du voyage",
+  "vehicles": "Véhicule",
+  "vehicleStatus": "état du véhicule",
+  "driver": "Chauffeur",
+  "reports": "Rapports",
+  "notification": "Notification",
+  "profile": "Profil",
+  "theme": "Thème",
+  "language": "Langue",
+  "logout": "Déconnexion",
+  "trackTrips": "Suivre les voyages",
+  "manageTrips": "Gérer les voyages",
+  "manageVehicles": "Gérer les véhicules",
+  "drivers": "Pilotes",
+  "addTrips": "Ajouter un voyage",
+  "addVehicle": "Ajouter un véhicule",
+  "editTrips": "Modifier les voyages",
+  "editVehicles": "Modifier les véhicules",
+  "events": "Épreuves"
+
+}
