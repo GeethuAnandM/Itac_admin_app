@@ -1,0 +1,26 @@
+{
+ "dashBoard":"Dashboard",
+ "tracking": "Tracking",
+ "location":"Location - Clustered",
+  "trips": "Trips",
+ "tripsOverview": "Trips OverView",
+  "vehicles": "Vehicles",
+ "vehicleStatus": "Vehicle Status",
+ "driver": "Driver",
+ "reports": "Reports",
+ "notification": "Notifications",
+ "profile": "Profile",
+ "theme": "Theme",
+ "language": "Language",
+ "logout": "Logout",
+ "trackTrips": "Track Trips",
+ "manageTrips": "Manage Trips",
+ "manageVehicles": "Manage Vehicles",
+ "drivers": "Drivers",
+ "addTrips": "Add Trip",
+ "addVehicle": "Add Vehicle",
+ "editTrips": "Edit Trips",
+ "editVehicles": "Edit Vehicles",
+ "events": "Events"
+
+}

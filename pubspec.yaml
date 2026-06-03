@@ -1,0 +1,134 @@
+name: admin_app
+description: A new Flutter project.
+
+publish_to: "none"
+version: 1.0.5
+
+environment:
+  sdk: ">=2.18.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  cupertino_icons: ^1.0.2
+  background_app_bar:
+  data_table_2:
+  syncfusion_flutter_datagrid:
+  pie_chart:
+  charts_flutter:
+  syncfusion_flutter_charts: ^20.3.57
+  dio: ^4.0.6
+  provider:
+  shared_preferences: 2.0.15
+  group_radio_button:
+  http:
+  flutter_redux: ^0.10.0
+  intl:
+  contained_tab_bar_view:
+  pin_code_fields:
+  flutter_easyloading:
+  lottie:
+  multi_select_flutter:
+  pdf:
+  syncfusion_flutter_pdf:
+  path_provider:
+  widgets:
+  loading_animation_widget:
+  open_filex:
+  permission_handler:
+  flutter_polyline_points:
+  google_maps_flutter:
+  location:
+  geocoding:
+  flutter_secure_storage:
+  get:
+  google_maps_cluster_manager:
+  double_back_to_close:
+#  file_picker:
+  image_picker:
+  overlay_support:
+#  flutter_local_notifications:
+  geolocator:
+  fluttertoast:
+  camera:
+  path:
+  validate:
+  webview_flutter:
+  english_words:
+  native_notify:
+  flutter_svg:
+  sizer:
+  device_preview:
+  auto_size_text: ^3.0.0
+  dropdown_search:
+  search_choices:
+  f_datetimerangepicker:
+  modal_bottom_sheet:
+  flutter_map: ^3.0.0
+  flutter_map_marker_popup: ^4.0.0
+  latlong2: ^0.8.1
+  wakelock:
+  custom_info_window: ^1.0.1
+  clippy_flutter: ^1.1.1
+
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  generate: true
+  uses-material-design: true
+
+  assets:
+    - images/
+    - images/caricon-icondred.png
+    - images/caricon-greenicon.png
+    - images/caricongreen.png
+    - images/cariconwhite.png
+    - images/bus-red.png
+    - images/caricongrey.png
+    - images/cariconred.png
+    - images/adminimage5.png
+    - images/adminimage6.png
+    - images/adminimage3.png
+    - images/adminimage2.png
+    - images/person.jpg
+    - images/caricon.png
+    - images/logo.png
+    - images/map.png
+    - images/person-icon.png
+    - images/forgotpasswordimage.png
+    - images/arrow.png
+    - images/profile.jpg
+    - images/truckicon.png
+    - images/caricon-grayicon.png
+    - images/busicon.png
+    - images/65095-car-animation.json
+    - images/caricontransparent.png
+    - images/busicontransparent.png
+    - images/truckicontransparent.png
+    - images/addtrip.jpg
+    - images/tripimage.jpeg
+    - images/bus-green.png
+    - images/truckred.png
+    - images/truckgreen.png
+    - images/new-car-icon-red.png
+    - images/new-car-icon-green.png
+    - images/
+    - images/car-top-view.png
+    - images/vehiclecar.svg
+    - images/location.png
+    - images/location_map.png
+    - images/navigation-marker.png
+    - images/deadline.png
+#    - Fonts/arial.ttf
+
+#  fonts:
+#    - family: Arial
+#      fonts:
+#        - asset: Fonts/arial.ttf
