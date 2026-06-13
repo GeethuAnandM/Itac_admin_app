@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'dart:io';
 
+double get iosFontAdjustment => Platform.isIOS ? 6.0 : 0.0;
 final subHeadTextStyle =
     TextStyle(fontSize: 23.sp, fontWeight: FontWeight.w500, color: blueColor);
 const normalTextStyle =
@@ -50,12 +52,12 @@ const appBarTextStyle = TextStyle(
 const subHeadTextStyleSmallFont =
     TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: textColourBlue);
 final blackTextStyle = TextStyle(
-    fontSize: 12.sp,
+    fontSize: 12.sp + iosFontAdjustment,
     fontWeight: FontWeight.w400,
     color: normalTextBlackColour,
     height: 1.5);
 final blueColouredTextStyle = TextStyle(
-    fontSize: 11.sp, fontWeight: FontWeight.w700, color: textColourBlue);
+    fontSize: 11.sp + iosFontAdjustment, fontWeight: FontWeight.w700, color: textColourBlue);
 const buttonTextStyle = TextStyle(
     fontWeight: FontWeight.bold, fontSize: 19, color: buttonTextColourWhite);
 const whiteTextStyle = TextStyle(

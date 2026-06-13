@@ -6,7 +6,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -615,14 +614,14 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
               margin: const EdgeInsets.fromLTRB(0, 5, 0, 10),
               child: DropdownSearch<VehicleDrop>(
                 enabled: isDistanceSubmitBtnClicked != true,
-                asyncItems: loadVehicleTypes,
+                items: (filter, loadProps) => loadVehicleTypes(filter),
                 selectedItem: selectedVehicleDrop,
                 compareFn: (VehicleDrop item, VehicleDrop selectedItem) {
                   return item.id == selectedItem.id;
                 },
                 itemAsString: (VehicleDrop item) => item.name,
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                    dropdownSearchDecoration: InputDecoration(
+                decoratorProps: DropDownDecoratorProps(
+                    decoration: InputDecoration(
                   hintText: 'Select Vehicle',
                   helperText: 'Single vehicle only',
                   label: Row(
@@ -640,14 +639,14 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
                   enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(7)),
                 )),
-                popupProps: const PopupProps.menu(
+                popupProps: PopupProps.menu(
                   searchFieldProps: TextFieldProps(
                       decoration: InputDecoration(
                     hintText: "Search Vehicles",
                   )),
                   showSearchBox: true,
                 ),
-                onChanged: (VehicleDrop? data) {
+                onSaved: (VehicleDrop? data) {
                   setState(() {
                     selectedVehicleDrop = data;
                     selectedVehicles = data == null ? [] : [data.id.toString()];

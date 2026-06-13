@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'package:admin_app/api/api.dart';
 import 'package:admin_app/screens/custom_widget.dart';
 import 'package:admin_app/screens/reportsscreen.dart';
@@ -9,9 +8,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import "package:flutter/material.dart";
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:pdf/widgets.dart' as PdfWidget;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -59,6 +56,7 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
   List<dynamic> showTable = [];
   bool isTime1GreaterThanTime2 = false;
   final Map<String, String> _eventLocationCache = {};
+  double get iosFontAdjustment => Platform.isIOS ? 6.0 : 0.0;
 
   String? get _eventTypesUrl => "${baseUrl}device/getEvents";
 
@@ -1055,12 +1053,14 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                   Container(
                     margin: const EdgeInsets.fromLTRB(0, 5, 0, 20),
                     child: DropdownSearch<EventDrop>.multiSelection(
+                      compareFn: (item, selectedItem) =>
+                          item.id == selectedItem.id,
                       enabled: isEventSubmitbtnclicked == true ? false : true,
                       selectedItems: selectedEvents,
                       itemAsString: (EventDrop item) => item.name,
-                      asyncItems: loadEventTypes,
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
+                      items: (filter, loadProps) => loadEventTypes(filter),
+                      decoratorProps: DropDownDecoratorProps(
+                          decoration: InputDecoration(
                               label: Row(
                                 children: const [
                                   Text('*',
@@ -1077,14 +1077,14 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                               enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(7)),
                               hintText: 'Select events')),
-                      popupProps: const PopupPropsMultiSelection.menu(
+                      popupProps: MultiSelectionPopupProps.menu(
                         showSearchBox: true,
                         searchFieldProps: TextFieldProps(
                           decoration:
                               InputDecoration(hintText: "Search Events"),
                         ),
                       ),
-                      onChanged: (List<EventDrop> data) {
+                      onSelected: (List<EventDrop> data) {
                         setState(() {
                           selectedEvents = data;
                         });
@@ -1106,7 +1106,7 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                         Text(
                           "Single vehicle only",
                           style: TextStyle(
-                            fontSize: 11.sp,
+                            fontSize: 11.sp + iosFontAdjustment,
                             fontWeight: FontWeight.w600,
                             color: const Color(0xFFB26A00),
                           ),
@@ -1120,15 +1120,15 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                     child: SingleChildScrollView(
                       child: DropdownSearch<VehicleDrop>(
                         enabled: isEventSubmitbtnclicked == true ? false : true,
-                        asyncItems: loadVehicleTypes,
+                        items: (filter, loadProps) => loadVehicleTypes(filter),
                         selectedItem: selectedVehicleDrop,
                         compareFn:
                             (VehicleDrop item, VehicleDrop selectedItem) {
                           return item.id == selectedItem.id;
                         },
                         itemAsString: (VehicleDrop item) => item.name,
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
+                        decoratorProps: DropDownDecoratorProps(
+                            decoration: InputDecoration(
                                 label: Row(
                                   children: [
                                     const Text('*',
@@ -1151,7 +1151,7 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                                   InputDecoration(hintText: "Search Vehicles")),
                           showSearchBox: true,
                         ),
-                        onChanged: (VehicleDrop? data) {
+                        onSelected: (VehicleDrop? data) {
                           setState(() {
                             selectedVehicleDrop = data;
                             selectedVehicles =
@@ -1340,8 +1340,7 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                                                                         12,
                                                                     fixedTopRows:
                                                                         1,
-                                                                    columns: const <
-                                                                        DataColumn>[
+                                                                    columns: const <DataColumn>[
                                                                       DataColumn(
                                                                           label:
                                                                               Text("Sl No")),
@@ -1370,8 +1369,7 @@ class _EventReportsScreenState extends State<EventReportsScreen> {
                                                                           .length,
                                                                       (index) =>
                                                                           DataRow(
-                                                                        cells: <
-                                                                            DataCell>[
+                                                                        cells: <DataCell>[
                                                                           DataCell(
                                                                               Text("${index + 1}")),
                                                                           DataCell(
@@ -1906,6 +1904,14 @@ class EventDrop {
   final String name;
 
   EventDrop(this.id, this.name);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is EventDrop && runtimeType == other.runtimeType && id == other.id;
+
+  @override
+  int get hashCode => id.hashCode;
 
   @override
   String toString() => name;

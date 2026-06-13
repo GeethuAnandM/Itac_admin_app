@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '/screens/themes.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:dio/dio.dart';
 import 'custom_widget.dart';
 import 'dashboardScreen.dart';
@@ -51,6 +50,7 @@ class _AdminLoginState extends State<AdminLogin> {
       dataBody.addAll(data);
     }
     print(dataBody);
+    print('${baseUrl}api/update-fcm');
     try {
       final response =
           await dio.post('${baseUrl}api/update-fcm', data: dataBody);

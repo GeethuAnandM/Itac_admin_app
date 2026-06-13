@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import '../api/api.dart';
@@ -132,12 +131,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * .01,
                       ),
-                      errormessage!.toString().isNotEmpty
+                      errormessage.toString().isNotEmpty
                           ? Container(
                               margin: EdgeInsets.fromLTRB(10, 8, 10, 9),
                               child: Center(
                                 child: Text(
-                                  errormessage!,
+                                  errormessage,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(color: offlineColor),
                                 ),

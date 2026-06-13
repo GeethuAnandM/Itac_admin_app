@@ -1,3 +1,4 @@
+import 'package:admin_app/l10n/app_localizations.dart';
 import 'package:admin_app/screens/adminlogin.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
@@ -10,8 +11,6 @@ import 'screens/color.dart';
 import 'package:admin_app/screens/dashboardScreen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'screens/themenotifier.dart';
-import "package:flutter_localizations/flutter_localizations.dart";
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 var themecolruserselected = "Blue And Indigo";
 var languageuserselected = "English";

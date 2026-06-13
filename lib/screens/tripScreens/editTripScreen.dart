@@ -384,18 +384,18 @@ class _EditTripScreenState extends State<EditTripScreen> {
         var edate = dateFormat1.format(enddate);
         print("onstart:$edate");
         DateTime returnstart = DateFormat("HH:mm:ss")
-            .parse(returnStartTimeController.text ?? "")
+            .parse(returnStartTimeController.text)
             .subtract(Duration(hours: 5, minutes: 30));
         var rstime = timeFormat.format(returnstart);
         DateTime returnend = DateFormat("HH:mm:ss")
-            .parse(returnEndTimeController.text ?? "")
+            .parse(returnEndTimeController.text)
             .subtract(Duration(hours: 5, minutes: 30));
         var retime = timeFormat.format(returnend);
         DateTime restartdate = DateFormat("dd-MM-yyyy")
-            .parse(returnStartDateController.text ?? "");
+            .parse(returnStartDateController.text);
         var resdate = dateFormat1.format(restartdate);
         DateTime reenddate =
-            DateFormat("dd-MM-yyyy").parse(returnEndDateController.text ?? "");
+            DateFormat("dd-MM-yyyy").parse(returnEndDateController.text);
         var reedate = dateFormat1.format(reenddate);
         datas = {
           "vehicleId": vehiclenamesend,
@@ -717,10 +717,11 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   child: DropdownSearch<VehicleDrop>(
+                                    compareFn: (item1, item2) => item1.id == item2.id,
                                     selectedItem: _vehicleNameselected,
-                                    dropdownDecoratorProps:
+                                    decoratorProps:
                                         const DropDownDecoratorProps(
-                                            dropdownSearchDecoration:
+                                            decoration:
                                                 InputDecoration(
                                       hintText: 'Select Vehicle Name',
                                       hintStyle: TextStyle(color: Colors.black),
@@ -731,10 +732,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                                 hintText:
                                                     "Select Vehicle Name")),
                                         showSearchBox: true),
-                                    items: vehiclenames,
-                                    asyncItems: (String filter) =>
-                                        filterdata(filter),
-                                    onChanged: (VehicleDrop? data) async {
+                                    items: (filter, loadProps) async {
+    return vehiclenames;
+  },
+                                    // asyncItems: (String filter) =>
+                                    //     filterdata(filter),
+                                    onSaved: (VehicleDrop? data) async {
                                       if (data != null) {
                                         setState(() {
                                           _vehicleNameselected = data;
@@ -766,10 +769,11 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   child: DropdownSearch<Trips>(
+                                    compareFn: (item1, item2) => item1.id == item2.id,
                                     selectedItem: _driverNameselected,
-                                    dropdownDecoratorProps:
+                                    decoratorProps:
                                         const DropDownDecoratorProps(
-                                            dropdownSearchDecoration:
+                                            decoration:
                                                 InputDecoration(
                                       hintText: 'Select Driver Name',
                                       hintStyle: TextStyle(color: Colors.black),
@@ -782,10 +786,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                                 hintText:
                                                     "Select Driver Name")),
                                         showSearchBox: true),
-                                    items: totTrip,
-                                    asyncItems: (String filter) =>
-                                        filterTrip(filter),
-                                    onChanged: (Trips? data) async {
+                                    items: (filter, loadProps) async {
+                                         return totTrip;
+                                      },
+                                    // asyncItems: (String filter) =>
+                                    //     filterTrip(filter),
+                                  onSelected: (Trips? data) async {
                                       if (data != null) {
                                         setState(() {
                                           _driverNameselected = data;

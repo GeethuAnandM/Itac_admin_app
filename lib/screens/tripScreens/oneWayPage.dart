@@ -1142,9 +1142,10 @@ class _OneWayState extends State<OneWay> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
                                 child: DropdownSearch<VehicleDrop>(
-                                  dropdownDecoratorProps:
+                                  compareFn: (item1, item2) => item1.id == item2.id,
+                                  decoratorProps:
                                       const DropDownDecoratorProps(
-                                          dropdownSearchDecoration:
+                                          decoration:
                                               InputDecoration(
                                                   hintText:
                                                       'Select Vehicle Name')),
@@ -1153,10 +1154,10 @@ class _OneWayState extends State<OneWay> {
                                           decoration: InputDecoration(
                                               hintText: "Select Vehicle Name")),
                                       showSearchBox: true),
-                                  items: totVehicle,
+                                  items: (filter, loadProps) => filterdata(filter),
                                   // asyncItems: (String filter) =>
                                   //     filterdata(filter),
-                                  onChanged: (VehicleDrop? data) async {
+                                  onSelected: (VehicleDrop? data) async {
                                     if (data != null) {
                                       setState(() {
                                         vehicleNameselected = data;
@@ -1241,9 +1242,10 @@ class _OneWayState extends State<OneWay> {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10))),
                                       child: DropdownSearch<Trips>(
-                                        dropdownDecoratorProps:
+                                        compareFn: (item1, item2) => item1.id == item2.id,
+                                        decoratorProps:
                                             const DropDownDecoratorProps(
-                                                dropdownSearchDecoration:
+                                                decoration:
                                                     InputDecoration(
                                                         hintText:
                                                             'Select Driver Name')),
@@ -1253,10 +1255,12 @@ class _OneWayState extends State<OneWay> {
                                                     hintText:
                                                         "Select Driver Name ")),
                                             showSearchBox: true),
-                                        items: _totTrip,
+                                        items: (filter, loadProps) async {
+    return _totTrip;
+  },
                                         // asyncItems: (String filter) =>
                                         //     filterTrip(filter),
-                                        onChanged: (Trips? data) async {
+                                        onSaved: (Trips? data) async {
                                           if (data != null) {
                                             setState(() {
                                               drivernames = data;
@@ -1411,10 +1415,17 @@ class VehicleDrop {
 
   String name;
   int id;
+
   @override
-  String toString() {
-    return '${this.name}';
-  }
+  String toString() => name;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is VehicleDrop && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class Trips {
@@ -1422,8 +1433,15 @@ class Trips {
 
   String name;
   int id;
+
   @override
-  String toString() {
-    return '${this.name}';
-  }
+  String toString() => name;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Trips && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

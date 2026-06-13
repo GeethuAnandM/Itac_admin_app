@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'adminlogin.dart';
 import 'createnewpassword.dart';
 import 'custom_widget.dart';
-import 'forgotpassword.dart';
 
 class ProfileScreen extends StatefulWidget {
   ProfileScreen({required this.profileInformation});
@@ -64,6 +63,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget build(BuildContext context) {
     print(widget.profileInformation);
+    final imagePath =
+        widget.profileInformation[0]['img_path']?.toString() ?? '';
     return Scaffold(
       key: _key,
       drawer: NavBar(),
@@ -79,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             elevation: 0,
           )),
       body: Container(
-        height: 800,
+        //height: 800,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Center(
@@ -91,12 +92,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   margin: EdgeInsets.fromLTRB(0, 20, 0, 15),
                   height: 120,
                   width: 120,
-                  child: widget.profileInformation[0]['img_path'] != null
+                  child: imagePath.isNotEmpty
                       ? Image.network(
-                          "${widget.profileInformation[0]['img_path']}",
-                          // width: 60,
-                          // height: 40,
+                          imagePath,
                           fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset("images/person.jpg");
+                          },
                         )
                       : Image.asset("images/person.jpg"),
                 ),
@@ -276,7 +278,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       Container(
-                        height: 70,
+                        constraints: const BoxConstraints(
+                          minHeight: 70,
+                        ),
                         margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
                         padding: EdgeInsets.fromLTRB(10, 5, 10, 8),
                         width: 300,
@@ -353,11 +357,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(
                     color: Color(0xFF848282),
                   ),
-                )
+                ),
                 //
-                // SizedBox(
-                //   height: 20,
-                // ),
+                 SizedBox(
+                   height: 20,
+                 ),
               ],
             ),
           ),

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:dio/dio.dart';
-import 'eventsscreen.dart';
 import 'themes.dart';
 
 int events = 0;

@@ -9,7 +9,7 @@ import '../languges/language_constants.dart';
 import '/screens/adminlogin.dart';
 import '/screens/profilescreen.dart';
 import '/screens/themes.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide RadioGroup;
 import 'package:group_radio_button/group_radio_button.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -18,7 +18,6 @@ import 'color.dart';
 import 'manageDriverScreen.dart';
 import 'tripScreens/managetripscreen.dart';
 import 'managevehiclescreen.dart';
-import 'notificationscreen.dart';
 import 'themenotifier.dart';
 import 'dashboardScreen.dart';
 
@@ -32,7 +31,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   final storage = FlutterSecureStorage();
   String _selectedColor = themecolruserselected;
-  String _selectedlanguage = languageuserselected;
+
   List<String> _colors = [
     "Blue And Indigo",
     "Deep Purple And Amber",
@@ -194,6 +193,9 @@ class _NavBarState extends State<NavBar> {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+            ),
             currentAccountPicture: CircleAvatar(
               child: ClipOval(
                 child: Image.asset(

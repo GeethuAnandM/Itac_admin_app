@@ -4,6 +4,11 @@ import 'package:flutter/material.dart';
 ThemeData? activeTheme;
 
 final blueAndIndigoTheme = ThemeData(
+  appBarTheme: const AppBarTheme(
+  backgroundColor: Colors.blue,
+  iconTheme: IconThemeData(color: Colors.white),
+  foregroundColor: Colors.white,
+),
   floatingActionButtonTheme:FloatingActionButtonThemeData(
       backgroundColor:Colors.indigo
   ) ,
@@ -20,124 +25,138 @@ final blueAndIndigoTheme = ThemeData(
   primaryColor: Colors.blue,
   primarySwatch:Colors.blue,
   brightness: Brightness.light,
-  backgroundColor: Colors.blue,
-  // shadowColor: Colors.indigo,
-  // cardColor: Colors.indigo,
+  scaffoldBackgroundColor: Colors.white,
   textTheme: TextTheme(
-      bodyText1: TextStyle(color: Colors.black),
-      bodyText2: TextStyle(color: Colors.black),
-      subtitle2: TextStyle(color: Colors.black),
-      headline1: TextStyle(color: Colors.black),
-      headline2: TextStyle(color: Colors.black),
-      headline3: TextStyle(color: Colors.black),
-      headline4: TextStyle(color: Colors.black),
-      headline5: TextStyle(color: Colors.black),
-      headline6: TextStyle(color: Colors.black),
-      subtitle1: TextStyle(color: Colors.black),
-      button: TextStyle(color:Colors.indigo),
-      caption: TextStyle(color: Colors.black)),
+    bodyLarge: TextStyle(color: Colors.black),
+    bodyMedium: TextStyle(color: Colors.black),
+    titleSmall: TextStyle(color: Colors.black),
+    displayLarge: TextStyle(color: Colors.black),
+    displayMedium: TextStyle(color: Colors.black),
+    displaySmall: TextStyle(color: Colors.black),
+    headlineMedium: TextStyle(color: Colors.black),
+    headlineSmall: TextStyle(color: Colors.black),
+    titleLarge: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    labelLarge: TextStyle(color: Colors.indigo),
+    bodySmall: TextStyle(color: Colors.black),
+  ),
 );
-
+ 
 final deepPurpleAndAmberTheme = ThemeData(
-  floatingActionButtonTheme:FloatingActionButtonThemeData(
-      backgroundColor:Colors.amber,
-  ) ,
+    appBarTheme: const AppBarTheme(
   backgroundColor: Colors.deepPurple,
-  buttonTheme: ButtonThemeData(
-    buttonColor: Colors.amber,
+  iconTheme: IconThemeData(color: Colors.white),
+  foregroundColor: Colors.white,
+),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.deepPurple,
+    primary: Colors.deepPurple,
+    secondary: Colors.amber,
+    brightness: Brightness.light,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.amber,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-      style: TextButton.styleFrom(
-    backgroundColor: Colors.white,
-    foregroundColor: Colors.black,
-  )),
-  // scaffoldBackgroundColor: Colors.amberAccent,
-  primarySwatch: Colors.deepPurple,
-  accentColor: Colors.deepPurple,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+    ),
+  ),
+  scaffoldBackgroundColor: Colors.white,
+  primaryColor: Colors.deepPurple,
   brightness: Brightness.light,
   textTheme: TextTheme(
-      bodyText1: TextStyle(color: Colors.black),
-      bodyText2: TextStyle(color: Colors.black),
-      subtitle2: TextStyle(color: Colors.black),
-      headline1: TextStyle(color: Colors.black),
-      headline2: TextStyle(color: Colors.black),
-      headline3: TextStyle(color: Colors.black),
-      headline4: TextStyle(color: Colors.black),
-      headline5: TextStyle(color: Colors.black),
-      headline6: TextStyle(color: Colors.black),
-      subtitle1: TextStyle(color: Colors.black),
-      button: TextStyle(color:Colors.amber),
-      caption: TextStyle(color: Colors.black)),
+    bodyLarge: TextStyle(color: Colors.black),
+    bodyMedium: TextStyle(color: Colors.black),
+    titleSmall: TextStyle(color: Colors.black),
+    displayLarge: TextStyle(color: Colors.black),
+    displayMedium: TextStyle(color: Colors.black),
+    displaySmall: TextStyle(color: Colors.black),
+    headlineMedium: TextStyle(color: Colors.black),
+    headlineSmall: TextStyle(color: Colors.black),
+    titleLarge: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    labelLarge: TextStyle(color: Colors.amber),
+    bodySmall: TextStyle(color: Colors.black),
+  ),
 );
-
+ 
 final pinkAndBlueGreyTheme = ThemeData(
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.pink,
+    primary: Colors.pink,
+    secondary: Colors.grey,
+    brightness: Brightness.dark,
+  ),
   appBarTheme: AppBarTheme(
-    backgroundColor:Colors.pink
+    backgroundColor: Colors.pink,
   ),
-  floatingActionButtonTheme:FloatingActionButtonThemeData(
-    backgroundColor:Colors.grey,
-  ) ,
-  buttonTheme: ButtonThemeData(
-    buttonColor: Colors.grey,
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.grey,
   ),
-  iconTheme: IconThemeData(color:Colors.white),
   elevatedButtonTheme: ElevatedButtonThemeData(
-      style: TextButton.styleFrom(
-    backgroundColor: Colors.white,
-    foregroundColor: Colors.black,
-  )),
-  backgroundColor: Colors.pink,
-  accentColor:Colors.pink,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+    ),
+  ),
+  iconTheme: IconThemeData(color: Colors.white),
+  scaffoldBackgroundColor: Colors.grey,
   primaryColor: Colors.pink,
-  // scaffoldBackgroundColor: Colors.pink,
-  primarySwatch: Colors.pink,
   brightness: Brightness.dark,
   textTheme: TextTheme(
-      bodyText1: TextStyle(color: Colors.white),
-      bodyText2: TextStyle(color: Colors.black),
-      subtitle2: TextStyle(color: Colors.white),
-      headline1: TextStyle(color: Colors.black),
-      headline2: TextStyle(color: Colors.black),
-      headline3: TextStyle(color: Colors.black),
-      headline4: TextStyle(color: Colors.black),
-      headline5: TextStyle(color: Colors.black),
-      headline6: TextStyle(color: Colors.black),
-      subtitle1: TextStyle(color: Colors.black),
-      button: TextStyle(color:Colors.grey,),
-      caption: TextStyle(color: Colors.black)),
+    bodyLarge: TextStyle(color: Colors.white),
+    bodyMedium: TextStyle(color: Colors.black),
+    titleSmall: TextStyle(color: Colors.white),
+    displayLarge: TextStyle(color: Colors.black),
+    displayMedium: TextStyle(color: Colors.black),
+    displaySmall: TextStyle(color: Colors.black),
+    headlineMedium: TextStyle(color: Colors.black),
+    headlineSmall: TextStyle(color: Colors.black),
+    titleLarge: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    labelLarge: TextStyle(color: Colors.grey),
+    bodySmall: TextStyle(color: Colors.black),
+  ),
 );
-
+ 
 final indigoAndPinkTheme = ThemeData(
-  floatingActionButtonTheme:FloatingActionButtonThemeData(
-    backgroundColor:Colors.pink,
-  ) ,
-  buttonTheme: ButtonThemeData(
-    buttonColor: Colors.pink,
+      appBarTheme: const AppBarTheme(
+  backgroundColor: Colors.indigo,
+  iconTheme: IconThemeData(color: Colors.white),
+  //foregroundColor: Colors.white,
+),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: Colors.indigo,
+    primary: Colors.indigo,
+    secondary: Colors.pink,
+    brightness: Brightness.light,
+  ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    backgroundColor: Colors.pink,
   ),
   elevatedButtonTheme: ElevatedButtonThemeData(
-      style: TextButton.styleFrom(
-    backgroundColor: Colors.white,
-    foregroundColor: Colors.black,
-  )),
-  backgroundColor: Colors.indigo,
-  accentColor:Colors.indigo,
-  // scaffoldBackgroundColor: Colors.pinkAccent,
-  primarySwatch: Colors.indigo,
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black,
+    ),
+  ),
+  scaffoldBackgroundColor: Colors.white,
   primaryColor: Colors.indigo,
   brightness: Brightness.light,
   textTheme: TextTheme(
-      bodyText1: TextStyle(color: Colors.black),
-      bodyText2: TextStyle(color: Colors.black),
-      subtitle2: TextStyle(color: Colors.black),
-      headline1: TextStyle(color: Colors.black),
-      headline2: TextStyle(color: Colors.black),
-      headline3: TextStyle(color: Colors.black),
-      headline4: TextStyle(color: Colors.black),
-      headline5: TextStyle(color: Colors.black),
-      button: TextStyle(color:Colors.pink),
-      headline6: TextStyle(color: Colors.black),
-      subtitle1: TextStyle(color: Colors.black),
-      caption: TextStyle(color: Colors.black)),
+    bodyLarge: TextStyle(color: Colors.black),
+    bodyMedium: TextStyle(color: Colors.black),
+    titleSmall: TextStyle(color: Colors.black),
+    displayLarge: TextStyle(color: Colors.black),
+    displayMedium: TextStyle(color: Colors.black),
+    displaySmall: TextStyle(color: Colors.black),
+    headlineMedium: TextStyle(color: Colors.black),
+    headlineSmall: TextStyle(color: Colors.black),
+    titleLarge: TextStyle(color: Colors.black),
+    titleMedium: TextStyle(color: Colors.black),
+    labelLarge: TextStyle(color: Colors.pink),
+    bodySmall: TextStyle(color: Colors.black),
+  ),
 );
-
-

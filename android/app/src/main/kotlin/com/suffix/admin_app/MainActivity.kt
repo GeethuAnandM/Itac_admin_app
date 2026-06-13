@@ -1,4 +1,4 @@
-package com.suffix.admin_app
+package com.itac.adminapp
 
 import io.flutter.embedding.android.FlutterActivity
 

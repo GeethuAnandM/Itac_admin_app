@@ -7,21 +7,16 @@ import 'package:admin_app/screens/reports/eventReport.dart';
 import 'package:admin_app/screens/reports/stopReport.dart';
 import 'package:admin_app/screens/sidebar.dart';
 import 'package:contained_tab_bar_view/contained_tab_bar_view.dart';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:dio/dio.dart';
-import 'package:http/http.dart';
 import 'package:intl/intl.dart';
-import 'package:multi_select_flutter/chip_field/multi_select_chip_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import '../languges/language_constants.dart';
 import '/screens/themes.dart';
 import 'package:flutter/material.dart';
-import 'custom_widget.dart';
 // import 'package:pdf/pdf.dart';
 // import 'package:pdf/widgets.dart' as pw;
 
@@ -404,34 +399,54 @@ class _ReportsScreenState extends State<ReportsScreen> {
           color: Colors.white54,
           height: 900,
           child: ContainedTabBarView(
+            tabBarProperties: TabBarProperties(
+              indicatorColor: Theme.of(context).primaryColor,
+              indicatorWeight: 3.0,
+            ),
             tabs: [
               Container(
                   height: 50,
                   child: Center(
                       child: Text(
                     'Distance',
-                    style: blackTextStyle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                    ),
                   ))),
               Container(
                   height: 50,
                   child: Center(
                       child: Text(
                     'Event',
-                    style: blackTextStyle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                    ),
                   ))),
               Container(
                   height: 50,
                   child: Center(
                       child: Text(
                     'Route',
-                    style: blackTextStyle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                    ),
                   ))),
               Container(
                   height: 50,
                   child: Center(
                       child: Text(
                     'Stop',
-                    style: blackTextStyle,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Colors.black87,
+                    ),
                   ))),
             ],
             views: [

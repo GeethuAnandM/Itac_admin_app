@@ -11,7 +11,7 @@
 // import 'package:location/location.dart';
 // import 'package:lottie/lottie.dart' as lottie;
 // import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:wakelock/wakelock.dart';
+// import 'package:wakelock_plus/wakelock_plus.dart';
 //
 // class TripVehicleTrack extends StatefulWidget {
 //   Map<dynamic, dynamic> trackdata;
@@ -594,7 +594,7 @@
 //                                           isRun == false
 //                                               ? IconButton(
 //                                                   onPressed: () async {
-//                                                     await Wakelock.enable();
+//                                                     await WakelockPlus.enable();
 //                                                     locationanimation();
 //                                                   },
 //                                                   icon: Image(
@@ -604,7 +604,7 @@
 //                                                 )
 //                                               : IconButton(
 //                                                   onPressed: () async {
-//                                                     await Wakelock.disable();
+//                                                     await WakelockPlus.disable();
 //                                                     pausetrack();
 //                                                     setState(() {
 //                                                       isPause = true;
@@ -620,7 +620,7 @@
 //                                           ),
 //                                           IconButton(
 //                                             onPressed: () async {
-//                                               await Wakelock.disable();
+//                                               await WakelockPlus.disable();
 //                                               resettoorigin();
 //                                               setState(() {
 //                                                 isPause = false;

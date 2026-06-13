@@ -106,6 +106,27 @@ class _TripScreenState extends State<TripScreen> {
     // print("res${response.data['list']}");
 
     for (var i = 0; i < response.data['list'].length; i++) {
+      final trip = response.data['list'][i];
+
+      final dateString = trip['onwardStartDateTime'] ?? trip['actualStartTime'];
+
+      if (dateString == null ||
+          dateString.toString().trim().isEmpty ||
+          dateString.toString() == "null") {
+        continue;
+      }
+
+      try {
+        final date = DateTime.parse(dateString.toString());
+
+        var formatted = DateFormat('dd-MM-yyyy').format(date);
+
+        if (dateOnly == formatted) {
+          tripListData.add(trip);
+        }
+      } catch (e) {
+        print("Invalid date format: $dateString");
+      }
       var date = DateTime.parse(response.data['list'][i]
               ['onwardStartDateTime'] ??
           response.data['list'][i]['actualStartTime']);

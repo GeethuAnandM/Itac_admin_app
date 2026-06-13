@@ -9,7 +9,7 @@
 // import 'package:intl/intl.dart';
 // import 'package:lottie/lottie.dart' as lottie;
 // import 'package:shared_preferences/shared_preferences.dart';
-// import 'package:wakelock/wakelock.dart';
+// import 'package:wakelock_plus/wakelock_plus.dart';
 //
 // class TripTrackLiveTrackScreen extends StatefulWidget {
 //   Map<dynamic, dynamic> trackdata;
@@ -538,7 +538,7 @@
 //           descriptor: BitmapDescriptor.fromBytes(urlList2),
 //           title: "currentLocation",
 //           rotation: heading.last);
-//       await Wakelock.enable();
+//       await WakelockPlus.enable();
 //       setState(() {});
 //     }();
 //     super.initState();
@@ -549,7 +549,7 @@
 //   @override
 //   void dispose() async {
 //     // print("dispose");
-//     await Wakelock.disable();
+//     await WakelockPlus.disable();
 //     super.dispose();
 //   }
 //

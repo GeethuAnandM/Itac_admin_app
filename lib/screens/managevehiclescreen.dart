@@ -17,7 +17,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'addvehiclescreen.dart';
 import 'editvehiclescreen.dart';
-import 'package:admin_app/screens/tracking_screen/location_tab_variables.dart';
 // var vehicleList = [];
 
 var lati;

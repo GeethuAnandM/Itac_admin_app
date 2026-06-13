@@ -5,9 +5,7 @@ import 'package:admin_app/screens/sidebar.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:intl/intl.dart';
-import 'package:search_choices/search_choices.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sizer/sizer.dart';
 import '../languges/language_constants.dart';
 import '../utils/vehicle_list_normalizer.dart';
 import '/screens/themes.dart';
@@ -40,8 +38,7 @@ class AddVehicleScreen extends StatefulWidget {
 }
 
 class _AddVehicleScreenState extends State<AddVehicleScreen> {
-  bool _isObscure = true;
-  bool _isObscure2 = true;
+
 
   List<ManageVehicles> TotalVehicle = [];
 
@@ -917,9 +914,9 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                             decoration: InputDecoration(
                                                 hintText:
                                                     "Search device name"))),
-                                    dropdownDecoratorProps:
+                                    decoratorProps:
                                         DropDownDecoratorProps(
-                                      dropdownSearchDecoration: InputDecoration(
+                                      decoration: InputDecoration(
                                         labelText: "Select a Device",
                                         hintText: "Select a Device",
                                         border: new OutlineInputBorder(
@@ -930,10 +927,12 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                         ),
                                       ),
                                     ),
-                                    items: totDevices,
+                                    items: (filter, loadProps) {
+  return totDevices;
+},
                                     // asyncItems: (String filter) =>
                                     //     filterdata(filter),
-                                    onChanged: (VehicleDropNew? data) async {
+                                    onSelected: (VehicleDropNew? data) async {
                                       if (data != null) {
                                         setState(() {
                                           // print("newvalue${vehicleNameselected!.id}");

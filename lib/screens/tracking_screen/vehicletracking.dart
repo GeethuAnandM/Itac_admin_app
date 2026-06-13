@@ -11,8 +11,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart' as lottie;
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
+
 
 class VehicleTracking extends StatefulWidget {
   Map<dynamic, dynamic> trackdata;
@@ -45,7 +45,7 @@ class _VehicleTrackingState extends State<VehicleTracking> {
   int currentspeed = normalspeed;
   Map<MarkerId, Marker> markers = {};
 
-  PolylinePoints polylinePoints = PolylinePoints();
+  PolylinePoints polylinePoints = PolylinePoints(apiKey: 'AIzaSyBOuXqXGvHOEm4edTS0lOAaXHpR1k7guYM');
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   // Google Maps controller
@@ -607,7 +607,7 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                                           isRun == false
                                               ? IconButton(
                                                   onPressed: () async {
-                                                    await Wakelock.enable();
+                                                    await WakelockPlus.enable();
                                                     locationanimation();
                                                   },
                                                   icon: Image(
@@ -617,7 +617,7 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                                                 )
                                               : IconButton(
                                                   onPressed: () async {
-                                                    await Wakelock.disable();
+                                                    await WakelockPlus.disable();
                                                     pausetrack();
                                                     setState(() {
                                                       isPause = true;
@@ -633,7 +633,7 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                                           ),
                                           IconButton(
                                             onPressed: () async {
-                                              await Wakelock.disable();
+                                              await WakelockPlus.disable();
                                               resettoorigin();
                                               setState(() {
                                                 isPause = false;

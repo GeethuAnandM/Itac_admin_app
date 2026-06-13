@@ -2,8 +2,6 @@ import 'package:admin_app/screens/tracking_screen/planned_event.dart';
 import 'package:admin_app/screens/tracking_screen/unplanned_event.dart';
 import 'package:flutter/material.dart';
 
-import '../tripScreens/oneWayPage.dart';
-import '../tripScreens/roundTripPage.dart';
 int selectedTab = 0;
 
 class EventListPage extends StatefulWidget {

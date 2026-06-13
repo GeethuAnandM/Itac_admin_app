@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:admin_app/api/api.dart';
 import 'package:admin_app/screens/custom_widget.dart';
 import 'package:admin_app/screens/reportsscreen.dart';
+import 'package:admin_app/screens/tracking_screen/vehicle_live_location.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:dio/dio.dart';
 import 'package:dropdown_search/dropdown_search.dart';
@@ -683,16 +684,16 @@ class _StopReportsScreenState extends State<StopReportsScreen> {
                     // width: 300,
                     child: SingleChildScrollView(
                       child: DropdownSearch<VehicleDrop>(
+                        items: (filter, loadProps) => loadVehicleTypes(filter),
                         enabled: isStopBtnClicked != true,
-                        asyncItems: loadVehicleTypes,
                         selectedItem: selectedVehicleDrop,
                         compareFn:
                             (VehicleDrop item, VehicleDrop selectedItem) {
                           return item.id == selectedItem.id;
                         },
                         itemAsString: (VehicleDrop item) => item.name,
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
+                        decoratorProps: DropDownDecoratorProps(
+                            decoration: InputDecoration(
                           hintText: 'Select Vehicle',
                           helperText: 'Single vehicle only',
                           label: Column(
@@ -721,7 +722,7 @@ class _StopReportsScreenState extends State<StopReportsScreen> {
                                   InputDecoration(hintText: "Search Vehicles")),
                           showSearchBox: true,
                         ),
-                        onChanged: (VehicleDrop? data) {
+                        onSelected: (VehicleDrop? data) {
                           setState(() {
                             selectedVehicleDrop = data;
                             selectedVehicles =

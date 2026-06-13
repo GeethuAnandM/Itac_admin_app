@@ -807,15 +807,15 @@ class _RouteReportsScreenState extends State<RouteReportsScreen> {
                     child: SingleChildScrollView(
                       child: DropdownSearch<VehicleDrop>(
                         enabled: isRouteBtnClicked != true,
-                        asyncItems: loadVehicleTypes,
+                        items: (filter, loadProps) => loadVehicleTypes(filter),
                         selectedItem: selectedVehicleDrop,
                         compareFn:
                             (VehicleDrop item, VehicleDrop selectedItem) {
                           return item.id == selectedItem.id;
                         },
                         itemAsString: (VehicleDrop item) => item.name,
-                        dropdownDecoratorProps: DropDownDecoratorProps(
-                            dropdownSearchDecoration: InputDecoration(
+                        decoratorProps: DropDownDecoratorProps(
+                           decoration: InputDecoration(
                           hintText: 'Select Vehicle',
                           helperText: 'Single vehicle only',
                           label: Row(
@@ -841,7 +841,7 @@ class _RouteReportsScreenState extends State<RouteReportsScreen> {
                                   hintStyle: TextStyle(color: Colors.grey))),
                           showSearchBox: true,
                         ),
-                        onChanged: (VehicleDrop? data) {
+                        onSelected: (VehicleDrop? data) {
                           setState(() {
                             selectedVehicleDrop = data;
                             selectedVehicles =

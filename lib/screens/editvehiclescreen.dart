@@ -337,7 +337,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       var userId = prefs.getString("user_id");
-      const url = "${baseUrl}api/manufacturer/439";
+      final url = "${baseUrl}api/manufacturer/439";
       //show error message try catch
       var dio = Dio();
       final response = await dio.get(url);
@@ -359,7 +359,8 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
       print("inside getvehiclesdetails: ${manufactures} ");
       print(manufacturesId);
     } catch (e) {
-      print("manufactrures c atch");
+      print("manufacturer error: $e");
+      ScaffoldMessenger.of(context).clearSnackBars();
     }
   }
 
@@ -378,7 +379,8 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
       });
       print("getVehicleTypesNew modelsss areaaa 3333are $getVehicleTypesNew");
     } catch (e) {
-      print(e);
+      print("getvehicleTypes error: $e");
+      ScaffoldMessenger.of(context).clearSnackBars();
     }
   }
 
@@ -582,9 +584,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
       return Demo;
     }
 
-    final loginIdController = TextEditingController();
     final vehiclenameController = TextEditingController();
-    final confirmpasswordController = TextEditingController();
     print(widget.data.length);
     print(TotalVehicle.length);
     Addvehicles();
@@ -897,13 +897,15 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                               padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
                               // width: MediaQuery.of(context).size.width * .8 ,
                               child: DropdownSearch<VehicleDropNew>(
+                                compareFn: (item1, item2) =>
+                                    item1.id == item2.id,
                                 popupProps: PopupProps.bottomSheet(
                                     showSearchBox: true,
                                     searchFieldProps: TextFieldProps(
                                         decoration: InputDecoration(
                                             hintText: "Search device name"))),
-                                dropdownDecoratorProps: DropDownDecoratorProps(
-                                  dropdownSearchDecoration: InputDecoration(
+                                decoratorProps: DropDownDecoratorProps(
+                                  decoration: InputDecoration(
                                     labelText:
                                         widget.detailsforedit['deviceName'] ??
                                             "Select A Device",
@@ -917,10 +919,12 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                                     ),
                                   ),
                                 ),
-                                items: totDevices,
+                                items: (filter, loadProps) => totDevices.isEmpty
+                                    ? <VehicleDropNew>[]
+                                    : totDevices,
                                 // asyncItems: (String filter) =>
                                 //     filterdata(filter),
-                                onChanged: (VehicleDropNew? data) async {
+                                onSaved: (VehicleDropNew? data) async {
                                   if (data != null) {
                                     setState(() {
                                       // print("newvalue${vehicleNameselected!.id}");
@@ -1587,12 +1591,12 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                     //     ),
                     //   ],
                     // ),
-                    errormessage!.toString().isNotEmpty
+                    errormessage.toString().isNotEmpty
                         ? Container(
                             margin: EdgeInsets.fromLTRB(5, 15, 5, 0),
                             child: Center(
                               child: Text(
-                                errormessage!,
+                                errormessage,
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                     color:
@@ -1905,15 +1909,21 @@ class VehicleDrop {
 }
 
 class VehicleDropNew {
-  var name;
-  var id;
-  var imei;
+  final dynamic id;
+  final String name;
+  final dynamic imei;
+
   VehicleDropNew(this.id, this.name, this.imei);
 
   @override
-  String toString() {
-    return '${this.name}';
-  }
+  String toString() => name;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is VehicleDropNew && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 class ManageVehicles {

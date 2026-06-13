@@ -3,12 +3,15 @@ import 'package:admin_app/screens/forgotpassword.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:sizer/sizer.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import '/screens/themes.dart';
 import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart' as pin_code;
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'adminlogin.dart';
 import 'createnewpassword.dart';
 import 'custom_widget.dart';
+import "package:pin_code_fields/pin_code_fields.dart";
 
 class OTPverification extends StatefulWidget {
   OTPverification({required this.otpvalue, required this.username});
@@ -21,6 +24,7 @@ class OTPverification extends StatefulWidget {
 
 class _OTPverificationState extends State<OTPverification> {
   final TextEditingController otpController = TextEditingController();
+  final pinController = PinInputController();
   var errormessage = '';
   var userEnteredValue = '';
 
@@ -179,46 +183,61 @@ class _OTPverificationState extends State<OTPverification> {
                                 ),
                               )
                             : Text(''),
+
                         SizedBox(
                           height: MediaQuery.of(context).size.height * .01,
                         ),
-                        PinCodeTextField(
-                          controller: otpController,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        // PinCodeTextField(
+                        //   controller: otpController,
+                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        //   length: 6,
+                        //   obscureText: false,
+                        //  // animationType: AnimationType.none,
+                        //   pinTheme: PinTheme(
+                        //     shape: PinCodeFieldShape.box,
+                        //     borderRadius: BorderRadius.circular(5),
+                        //     fieldHeight: 50,
+                        //     fieldWidth: 40,
+                        //     activeColor: Colors.black12,
+                        //     inactiveColor: Colors.black26,
+                        //     disabledColor: Colors.white,
+                        //     selectedFillColor: Colors.white,
+                        //     selectedColor: Colors.black26,
+                        //     activeFillColor: Colors.white,
+                        //     inactiveFillColor: Colors.white,
+                        //     errorBorderColor: Colors.white,
+                        //   ),
+                        //   animationDuration: Duration(milliseconds: 300),
+                        //   enableActiveFill: true,
+                        //   onCompleted: (v) {
+                        //     print("Completed");
+                        //   },
+                        //   onChanged: (value) {
+                        //     print(value);
+                        //     print("value is here $value");
+                        //     // setState(() {
+                        //     //   userEnteredValue = value;
+                        //     // });
+                        //   },
+                        //   beforeTextPaste: (text) {
+                        //     print("Allowing to paste $text");
+                        //     return true;
+                        //   },
+                        // ),
+                        MaterialPinField(
                           length: 6,
-                          obscureText: false,
-                          animationType: AnimationType.fade,
-                          pinTheme: PinTheme(
-                            shape: PinCodeFieldShape.box,
-                            borderRadius: BorderRadius.circular(5),
-                            fieldHeight: 50,
-                            fieldWidth: 40,
-                            activeColor: Colors.black12,
-                            inactiveColor: Colors.black26,
-                            disabledColor: Colors.white,
-                            selectedFillColor: Colors.white,
-                            selectedColor: Colors.black26,
-                            activeFillColor: Colors.white,
-                            inactiveFillColor: Colors.white,
-                            errorBorderColor: Colors.white,
+                          pinController: pinController,
+                          theme: MaterialPinTheme(
+                            shape: MaterialPinShape.outlined,
+                            cellSize: const Size(40, 50),
                           ),
-                          animationDuration: Duration(milliseconds: 300),
-                          enableActiveFill: true,
-                          onCompleted: (v) {
-                            print("Completed");
-                          },
                           onChanged: (value) {
-                            print(value);
-                            print("value is here $value");
-                            // setState(() {
-                            //   userEnteredValue = value;
-                            // });
+                            otpController.text = value;
                           },
-                          beforeTextPaste: (text) {
-                            print("Allowing to paste $text");
-                            return true;
+                          onCompleted: (value) {
+                            otpController.text = value;
+                            print("Completed: $value");
                           },
-                          appContext: (context),
                         ),
                         SizedBox(
                           height: MediaQuery.of(context).size.height * .01,
@@ -332,7 +351,7 @@ class _OTPverificationState extends State<OTPverification> {
                       BoxShadow(
                         offset: Offset(0, 1),
                         blurRadius: 4,
-                        color: Colors.black.withOpacity(0.2),
+                        color: Colors.black.withValues(alpha: 0.2),
                       ),
                     ],
                   ),

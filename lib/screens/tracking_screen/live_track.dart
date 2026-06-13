@@ -6,11 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:get/utils.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart' as lottie;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:wakelock/wakelock.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 class LiveTrackScreen extends StatefulWidget {
   Map<dynamic, dynamic> trackdata;
@@ -46,7 +47,7 @@ var dateFormat1 = DateFormat("dd-MM-yyyy hh:mm:ss a");
 int currentspeed = normalspeed;
 Map<MarkerId, Marker> markers = {};
 
-PolylinePoints polylinePoints = PolylinePoints();
+PolylinePoints polylinePoints = PolylinePoints(apiKey: 'AIzaSyBOuXqXGvHOEm4edTS0lOAaXHpR1k7guYM');
 Map<PolylineId, Polyline> polylines = {};
 List<LatLng> polylineCoordinates = [];
 List<LatLng> newpolylineCoordinates = [];
@@ -343,8 +344,9 @@ class _LiveTrackScreenState extends State<LiveTrackScreen> {
           positionParam: polylineCoordinates.last,
           infoWindowParam: InfoWindow(
               title: "${widget.trackdata["vehicleName"]}", snippet: " "));
-      currentSpeed =
-          vehTrackData[vehTrackData.length - 1]["speed"].toStringAsFixed(2);
+      currentSpeed = vehTrackData.length > 0
+          ? vehTrackData[vehTrackData.length - 1]["speed"].toStringAsFixed(2)
+          : "--";
       // print("speed current $currentSpeed");
       googleMapController2.animateCamera(
         CameraUpdate.newCameraPosition(
@@ -579,7 +581,7 @@ class _LiveTrackScreenState extends State<LiveTrackScreen> {
           descriptor: BitmapDescriptor.fromBytes(urlList2),
           title: "${widget.trackdata["vehicleName"]}",
           rotation: heading.last.toDouble());
-      await Wakelock.enable();
+      await WakelockPlus.enable();
       setState(() {});
     }();
     super.initState();
@@ -589,7 +591,7 @@ class _LiveTrackScreenState extends State<LiveTrackScreen> {
   @override
   void dispose() async {
     // print("dispose");
-    await Wakelock.disable();
+    await WakelockPlus.disable();
     super.dispose();
   }
 

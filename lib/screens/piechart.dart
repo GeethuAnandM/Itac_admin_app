@@ -3,7 +3,6 @@ import 'package:admin_app/screens/themes.dart';
 import 'package:admin_app/screens/vehiclescreen.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../utils/vehicle_list_normalizer.dart';
@@ -71,7 +70,6 @@ class _PiechartState extends State<Piechart> {
     }
   }
 
-  late SelectionBehavior _selectionBehavior;
   @override
   initState() {
     () async {

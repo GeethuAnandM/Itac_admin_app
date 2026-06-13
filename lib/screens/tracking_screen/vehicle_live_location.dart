@@ -5,10 +5,10 @@ import 'dart:ui';
 import 'package:admin_app/api/api.dart';
 import 'package:admin_app/screens/tracking_screen/location_tab_variables.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_cluster_manager/google_maps_cluster_manager.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'
+    hide Cluster, ClusterManager;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 //import 'package:intl/intl.dart';
@@ -123,11 +123,13 @@ class VehicleLocationMapState extends State<VehicleLocationMap> {
         print("vlist packet : ${i['packetTime']}");
       }
       print("sList unsorted ${sList}"); // for data display
-      vList.sort((b, a) => (a["packetTime"]).compareTo(b["packetTime"]));
+      vList.sort(
+          (b, a) => (a["packetTime"] ?? "").compareTo(b["packetTime"] ?? ""));
       print("vList sorted ${vList}");
       print(vehicleList.runtimeType);
       vehicleList = vList;
-      print("VehicleList length: ${vehicleList.length}");
+      print(
+          "VehicleList length in getAllvehiclesLocation1: ${vehicleList.length}");
       print("VehicleList: ${vehicleList}");
       //for vehicle list to have all records
       for (var i in sList) {
@@ -137,7 +139,8 @@ class VehicleLocationMapState extends State<VehicleLocationMap> {
         }
       }
     }
-    print("VehicleList length: ${vehicleList.length}");
+    print(
+        "VehicleList length in getAllvehiclesLocation2: ${vehicleList.length}");
     for (var i in vehicleList) {
       print("pkttime from vehlist: ${i['packetTime']}");
     }
@@ -174,6 +177,8 @@ class VehicleLocationMapState extends State<VehicleLocationMap> {
   List<dynamic> getLocCoordinateList(vehicleList) {
     var validCoordinates = 0;
     clusterData = [];
+    latlng.clear();
+    clusterData.clear();
     print("function getting coordinates: vehiclelist length: ${vehicleList}");
     for (var i in vehicleList) {
       if (i["latitude"] != null) {
@@ -267,7 +272,7 @@ class VehicleLocationMapState extends State<VehicleLocationMap> {
             // if we got our data
           } else if (snapshot.hasData) {
             // createPlaces();
-            print("length of items: ${items.length}");
+            print("length of items in build: ${items.length}");
             // manager = initClusterManager();
             return CreateMap(vehicles: clusterData);
           }
@@ -377,7 +382,7 @@ class _CreateMapState extends State<CreateMap> {
                   .toLowerCase()
                   .replaceAll(" ", "")
                   .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person["speed"]
+              (person["speed"] ?? "")
                   .toString()
                   .toLowerCase()
                   .replaceAll(" ", "")
@@ -522,7 +527,7 @@ class _CreateMapState extends State<CreateMap> {
                       width: 14,
                     ),
                     Text(
-                      "Trip Name: " + vehicle["tripName"],
+                      "Trip Name: " + (vehicle["tripName"] ?? "--"),
                       style: TextStyle(
                         fontSize: 12.0,
                         fontWeight: FontWeight.bold,
@@ -935,11 +940,12 @@ class _CreateMapState extends State<CreateMap> {
                       SizedBox(
                           height: 500.0,
                           child: ListView.builder(
-                              itemCount: vehicleList.length,
+                              itemCount: 5,
                               itemBuilder: (context, index) {
                                 var lastReportedDateTime = dateFormatter(
                                     vehicleList[index]["packetTime"]);
-                                print("last reported: ${lastReportedDateTime}");
+                                print(
+                                    "last reported1: ${lastReportedDateTime}");
                                 return Container(
                                   decoration: BoxDecoration(
                                       border: Border.all(
@@ -985,7 +991,7 @@ class _CreateMapState extends State<CreateMap> {
                                             Container(
                                               width: 250.00,
                                               child: Text(
-                                                "Last Reported: " +
+                                                "Last Reported2: " +
                                                         lastReportedDateTime
                                                             .toString() ??
                                                     "-",
@@ -1003,10 +1009,12 @@ class _CreateMapState extends State<CreateMap> {
                                       ],
                                     ),
                                     subtitle: Text(
-                                      "Speed: " +
-                                              vehicleList[index]["speed"]
-                                                  .toStringAsFixed(0) ??
-                                          "-",
+                                      "Speed: ${(vehicleList[index]["speed"] ?? 0).toStringAsFixed(0)} km/h",
+                                      //"Speed: ", // need to fix
+                                      //"Speed: " +
+                                      //     vehicleList[index]["speed"]
+                                      //         .toStringAsFixed(0) ??
+                                      // "-",
                                       style: TextStyle(
                                         fontSize: 12.0,
                                         fontWeight: FontWeight.bold,
@@ -1050,9 +1058,10 @@ class CreateClusterMapState extends State<CreateClusterMap> {
     print("Initial cam position : ${camPosition.toString()}");
     items = [
       for (var i in widget.vehicles)
-        Place(
-            name: i["vehicleName"],
-            latLng: LatLng(i["latitude"], i["longitude"])),
+        if (i["latitude"] != null && i["longitude"] != null) // ← guard here
+          Place(
+              name: i["vehicleName"] ?? "Unknown",
+              latLng: LatLng(i["latitude"], i["longitude"]))
     ];
     // for (var i in items) {
     //   print("Items: ${i.name}");
@@ -1061,11 +1070,19 @@ class CreateClusterMapState extends State<CreateClusterMap> {
 
   @override
   void initState() {
+    print("CreateClusterMap initState START");
+
     createPlaces();
-    print("length of items: ${items.length}");
+
+    print("CreateClusterMap createPlaces DONE");
 
     _manager = _initClusterManager();
+
+    print("CreateClusterMap manager DONE");
+
     super.initState();
+
+    print("CreateClusterMap initState END");
   }
 
   ClusterManager<Place> _initClusterManager() {
@@ -1083,6 +1100,18 @@ class CreateClusterMapState extends State<CreateClusterMap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // body: GoogleMap(
+      //   mapType: MapType.normal,
+      //   myLocationEnabled: false,
+      //   zoomControlsEnabled: true,
+      //   initialCameraPosition: const CameraPosition(
+      //     target: LatLng(37.7749, -122.4194), // San Francisco
+      //     zoom: 12,
+      //   ),
+      //   onMapCreated: (controller) {
+      //     print("MAP CREATED");
+      //   },
+      // ),
       body: GoogleMap(
           mapType: MapType.normal,
           rotateGesturesEnabled: true,
@@ -1095,10 +1124,13 @@ class CreateClusterMapState extends State<CreateClusterMap> {
             target: camPosition,
             zoom: 6.5,
           ),
-          markers: markers,
+          //markers: markers,
           onMapCreated: (GoogleMapController controller) {
+            print("MAP CREATED");
             _controller.complete(controller);
+            print("MAP CONTROLLER COMPLETE");
             _manager.setMapId(controller.mapId);
+             print("MAP ID SET");
           },
           onCameraMove: _manager.onCameraMove,
           onCameraIdle: _manager.updateMap),
@@ -1109,50 +1141,76 @@ class CreateClusterMapState extends State<CreateClusterMap> {
       (cluster) async {
         return Marker(
           markerId: MarkerId(cluster.getId()),
-          infoWindow: InfoWindow(title: "${cluster.items.first.name}"),
           position: cluster.location,
-          onTap: () {
-            print('---- $cluster');
-            cluster.items.forEach((p) => print(p.name));
-          },
-          icon: cluster.isMultiple
-              ? await _getMarkerBitmap(cluster.isMultiple ? 125 : 80,
-                  text: cluster.isMultiple ? cluster.count.toString() : null)
-              : await BitmapDescriptor.fromBytes(urlList2),
+          icon: BitmapDescriptor.defaultMarker,
         );
       };
 
+  // Future<Marker> Function(Cluster<Place>) get _markerBuilder =>
+  //     (cluster) async {
+  //       try {
+  //         return Marker(
+  //           markerId: MarkerId(cluster.getId()),
+  //           infoWindow: InfoWindow(title: "${cluster.items.first.name}"),
+  //           position: cluster.location,
+  //           onTap: () {
+  //             print('---- $cluster');
+  //             cluster.items.forEach((p) => print(p.name));
+  //           },
+  //           icon: cluster.isMultiple
+  //               ? await _getMarkerBitmap(125, text: cluster.count.toString())
+  //               : urlList2 != null // ← null guard
+  //                   ? await BitmapDescriptor.fromBytes(urlList2)
+  //                   : BitmapDescriptor.defaultMarker, // ← safe fallback
+  //         );
+  //       } catch (e) {
+  //         print("Marker builder error: $e");
+  //         return Marker(
+  //           markerId: MarkerId(cluster.getId()),
+  //           position: cluster.location,
+  //           icon: BitmapDescriptor.defaultMarker, // ← crash fallback
+  //         );
+  //       }
+  //     };
+
   Future<BitmapDescriptor> _getMarkerBitmap(int size, {String? text}) async {
-    if (kIsWeb) size = (size / 2).floor();
+    try {
+      if (kIsWeb) size = (size / 2).floor();
 
-    final PictureRecorder pictureRecorder = PictureRecorder();
-    final Canvas canvas = Canvas(pictureRecorder);
-    final Paint paint1 = Paint()..color = Colors.orange;
-    final Paint paint2 = Paint()..color = Colors.white;
+      final PictureRecorder pictureRecorder = PictureRecorder();
+      final Canvas canvas = Canvas(pictureRecorder);
+      final Paint paint1 = Paint()..color = Colors.orange;
+      final Paint paint2 = Paint()..color = Colors.white;
 
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint2);
-    canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
+      canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
+      canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint2);
+      canvas.drawCircle(Offset(size / 2, size / 2), size / 2.0, paint1);
 
-    if (text != null) {
-      TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
-      painter.text = TextSpan(
-        text: text,
-        style: TextStyle(
+      if (text != null) {
+        TextPainter painter = TextPainter(textDirection: TextDirection.ltr);
+        painter.text = TextSpan(
+          text: text,
+          style: TextStyle(
             fontSize: size / 3,
             color: Colors.white,
-            fontWeight: FontWeight.normal),
-      );
-      painter.layout();
-      painter.paint(
-        canvas,
-        Offset(size / 2 - painter.width / 2, size / 2 - painter.height / 2),
-      );
-    }
+            fontWeight: FontWeight.normal,
+          ),
+        );
+        painter.layout();
+        painter.paint(
+          canvas,
+          Offset(size / 2 - painter.width / 2, size / 2 - painter.height / 2),
+        );
+      }
 
-    final img = await pictureRecorder.endRecording().toImage(size, size);
-    final data = await img.toByteData(format: ImageByteFormat.png) as ByteData;
-    return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
+      final img = await pictureRecorder.endRecording().toImage(size, size);
+      final data =
+          await img.toByteData(format: ImageByteFormat.png) as ByteData;
+      return BitmapDescriptor.fromBytes(data.buffer.asUint8List());
+    } catch (e) {
+      print("_getMarkerBitmap error: $e");
+      return BitmapDescriptor.defaultMarker;
+    }
   }
 }
 
