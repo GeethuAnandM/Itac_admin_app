@@ -880,6 +880,8 @@ class _CreateMapState extends State<CreateMap> {
                               });
                         },
                         icon: const Image(
+                          width: 30,
+                          height: 30,
                           image: AssetImage("images/share.png"),
                         ))
                   ],
@@ -901,7 +903,7 @@ class _CreateMapState extends State<CreateMap> {
       child: Stack(
         children: [
           Positioned.fill(
-              bottom: MediaQuery.of(context).size.height * 0.10,
+              bottom: MediaQuery.of(context).size.height * 0.18,
               child: CreateClusterMap(clusterData)),
           Positioned.fill(
               child: DraggableScrollableSheet(
@@ -1100,18 +1102,6 @@ class CreateClusterMapState extends State<CreateClusterMap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // body: GoogleMap(
-      //   mapType: MapType.normal,
-      //   myLocationEnabled: false,
-      //   zoomControlsEnabled: true,
-      //   initialCameraPosition: const CameraPosition(
-      //     target: LatLng(37.7749, -122.4194), // San Francisco
-      //     zoom: 12,
-      //   ),
-      //   onMapCreated: (controller) {
-      //     print("MAP CREATED");
-      //   },
-      // ),
       body: GoogleMap(
           mapType: MapType.normal,
           rotateGesturesEnabled: true,
@@ -1124,54 +1114,54 @@ class CreateClusterMapState extends State<CreateClusterMap> {
             target: camPosition,
             zoom: 6.5,
           ),
-          //markers: markers,
+          markers: markers,
           onMapCreated: (GoogleMapController controller) {
             print("MAP CREATED");
             _controller.complete(controller);
             print("MAP CONTROLLER COMPLETE");
             _manager.setMapId(controller.mapId);
-             print("MAP ID SET");
+            print("MAP ID SET");
           },
           onCameraMove: _manager.onCameraMove,
           onCameraIdle: _manager.updateMap),
     );
   }
 
-  Future<Marker> Function(Cluster<Place>) get _markerBuilder =>
-      (cluster) async {
-        return Marker(
-          markerId: MarkerId(cluster.getId()),
-          position: cluster.location,
-          icon: BitmapDescriptor.defaultMarker,
-        );
-      };
-
   // Future<Marker> Function(Cluster<Place>) get _markerBuilder =>
   //     (cluster) async {
-  //       try {
-  //         return Marker(
-  //           markerId: MarkerId(cluster.getId()),
-  //           infoWindow: InfoWindow(title: "${cluster.items.first.name}"),
-  //           position: cluster.location,
-  //           onTap: () {
-  //             print('---- $cluster');
-  //             cluster.items.forEach((p) => print(p.name));
-  //           },
-  //           icon: cluster.isMultiple
-  //               ? await _getMarkerBitmap(125, text: cluster.count.toString())
-  //               : urlList2 != null // ← null guard
-  //                   ? await BitmapDescriptor.fromBytes(urlList2)
-  //                   : BitmapDescriptor.defaultMarker, // ← safe fallback
-  //         );
-  //       } catch (e) {
-  //         print("Marker builder error: $e");
-  //         return Marker(
-  //           markerId: MarkerId(cluster.getId()),
-  //           position: cluster.location,
-  //           icon: BitmapDescriptor.defaultMarker, // ← crash fallback
-  //         );
-  //       }
+  //       return Marker(
+  //         markerId: MarkerId(cluster.getId()),
+  //         position: cluster.location,
+  //         icon: BitmapDescriptor.defaultMarker,
+  //       );
   //     };
+
+  Future<Marker> Function(Cluster<Place>) get _markerBuilder =>
+      (cluster) async {
+        try {
+          return Marker(
+            markerId: MarkerId(cluster.getId()),
+            infoWindow: InfoWindow(title: "${cluster.items.first.name}"),
+            position: cluster.location,
+            onTap: () {
+              print('---- $cluster');
+              cluster.items.forEach((p) => print(p.name));
+            },
+            icon: cluster.isMultiple
+                ? await _getMarkerBitmap(125, text: cluster.count.toString())
+                : urlList2 != null // ← null guard
+                    ? await BitmapDescriptor.fromBytes(urlList2)
+                    : BitmapDescriptor.defaultMarker, // ← safe fallback
+          );
+        } catch (e) {
+          print("Marker builder error: $e");
+          return Marker(
+            markerId: MarkerId(cluster.getId()),
+            position: cluster.location,
+            icon: BitmapDescriptor.defaultMarker, // ← crash fallback
+          );
+        }
+      };
 
   Future<BitmapDescriptor> _getMarkerBitmap(int size, {String? text}) async {
     try {

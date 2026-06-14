@@ -172,9 +172,11 @@ class CurrentLocationMapState extends State<CurrentLocationMap> {
       body: Stack(
         children: [
           StreamBuilder(
-              stream: getLocationStream(const Duration(seconds: 1)),
+              stream: getLocationStream(const Duration(seconds: 2)),
               builder: (context, snapshot) {
                 print("Snapshot: " + snapshot.toString());
+                print("mId = $mId");
+                print("mId runtimeType = ${mId.runtimeType}");
                 // vehSpeed = snapshot.data["speed"] != null
                 //     ? snapshot.data["speed"]
                 //     : 0.00;
@@ -194,14 +196,24 @@ class CurrentLocationMapState extends State<CurrentLocationMap> {
                             title: "Speed: " + currentSpeed, snippet: vehName)),
                   },
                   onMapCreated: (mapController) {
-                    mapController
-                        .showMarkerInfoWindow(MarkerId(mId.toString()));
                     _controller.complete(mapController);
+
+                    WidgetsBinding.instance.addPostFrameCallback((_) async {
+                      await Future.delayed(
+                        const Duration(milliseconds: 1000),
+                      );
+
+                      try {
+                        mapController.showMarkerInfoWindow(mId);
+                      } catch (e) {
+                        print(e);
+                      }
+                    });
                   },
                 );
               }),
           Positioned(
-              top: MediaQuery.of(context).size.height * 0.765,
+              top: MediaQuery.of(context).size.height * 0.7,
               left: 5.0,
               child: Column(
                 children: [

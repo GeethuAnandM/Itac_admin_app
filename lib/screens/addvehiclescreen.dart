@@ -38,8 +38,6 @@ class AddVehicleScreen extends StatefulWidget {
 }
 
 class _AddVehicleScreenState extends State<AddVehicleScreen> {
-
-
   List<ManageVehicles> TotalVehicle = [];
 
   bool licenseplatematch = false;
@@ -908,14 +906,15 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                   padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
                                   // width: MediaQuery.of(context).size.width * .8 ,
                                   child: DropdownSearch<VehicleDropNew>(
+                                    compareFn: (item, selectedItem) =>
+                                        item.id == selectedItem.id,
                                     popupProps: PopupProps.bottomSheet(
                                         showSearchBox: true,
                                         searchFieldProps: TextFieldProps(
                                             decoration: InputDecoration(
                                                 hintText:
                                                     "Search device name"))),
-                                    decoratorProps:
-                                        DropDownDecoratorProps(
+                                    decoratorProps: DropDownDecoratorProps(
                                       decoration: InputDecoration(
                                         labelText: "Select a Device",
                                         hintText: "Select a Device",
@@ -928,8 +927,8 @@ class _AddVehicleScreenState extends State<AddVehicleScreen> {
                                       ),
                                     ),
                                     items: (filter, loadProps) {
-  return totDevices;
-},
+                                      return totDevices;
+                                    },
                                     // asyncItems: (String filter) =>
                                     //     filterdata(filter),
                                     onSelected: (VehicleDropNew? data) async {
