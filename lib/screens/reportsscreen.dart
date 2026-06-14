@@ -11,6 +11,7 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -497,29 +498,61 @@ class Vehicles {
   });
 }
 
+// class SaveFile {
+//   static Future<void> saveAndLaunchFile(
+//       List<int> bytes, String fileName) async {
+//     //Get external storage directory
+//     // final directory =
+//     //     (await getExternalStorageDirectories(type: StorageDirectory.downloads))!
+//     //         .first;
+
+//     final directory = Directory('/storage/emulated/0/Download');
+
+//     //Get directory path
+//     String path = directory.path;
+//     var status = await Permission.storage.status;
+//     if (!status.isGranted) {
+//       await Permission.storage.request();
+//     }
+//     //Create an empty file to write PDF data
+//     File file = await File('$path/$fileName').create(recursive: true);
+//     //Write PDF data
+//     await file.writeAsBytes(bytes, flush: true);
+//     //Open the PDF document in mobile
+//     if (file.existsSync()) {
+//       OpenFilex.open('$path/$fileName');
+//     }
+//   }
+// }
+
 class SaveFile {
   static Future<void> saveAndLaunchFile(
-      List<int> bytes, String fileName) async {
-    //Get external storage directory
-    // final directory =
-    //     (await getExternalStorageDirectories(type: StorageDirectory.downloads))!
-    //         .first;
+      List<int> bytes,
+      String fileName,
+  ) async {
 
-    final directory = Directory('/storage/emulated/0/Download');
+    Directory directory;
 
-    //Get directory path
-    String path = directory.path;
-    var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
+    if (Platform.isAndroid) {
+      directory = Directory('/storage/emulated/0/Download');
+
+      if (!await directory.exists()) {
+        directory = await getApplicationDocumentsDirectory();
+      }
+    } else if (Platform.isIOS) {
+      directory = await getApplicationDocumentsDirectory();
+    } else {
+      directory = await getTemporaryDirectory();
     }
-    //Create an empty file to write PDF data
-    File file = await File('$path/$fileName').create(recursive: true);
-    //Write PDF data
+
+    final String path = '${directory.path}/$fileName';
+
+    final File file = File(path);
+
     await file.writeAsBytes(bytes, flush: true);
-    //Open the PDF document in mobile
-    if (file.existsSync()) {
-      OpenFilex.open('$path/$fileName');
-    }
+
+    print('PDF Saved: $path');
+
+    await OpenFilex.open(path);
   }
 }
