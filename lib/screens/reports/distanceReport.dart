@@ -619,6 +619,14 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
                 compareFn: (VehicleDrop item, VehicleDrop selectedItem) {
                   return item.id == selectedItem.id;
                 },
+                onSelected: (VehicleDrop? data) {
+                  setState(() {
+                    selectedVehicleDrop = data;
+                    selectedVehicles = data == null ? [] : [data.id.toString()];
+                  });
+                  print(
+                      "selected veehilesss in dropw down is:$selectedVehicles");
+                },
                 itemAsString: (VehicleDrop item) => item.name,
                 decoratorProps: DropDownDecoratorProps(
                     decoration: InputDecoration(
@@ -646,14 +654,6 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
                   )),
                   showSearchBox: true,
                 ),
-                onSaved: (VehicleDrop? data) {
-                  setState(() {
-                    selectedVehicleDrop = data;
-                    selectedVehicles = data == null ? [] : [data.id.toString()];
-                  });
-                  print(
-                      "selected veehilesss in dropw down is:$selectedVehicles");
-                },
               ),
             ),
             submitClicked == true
@@ -825,8 +825,7 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
                                                               ScrollController(),
                                                           columnSpacing: 5,
                                                           fixedTopRows: 1,
-                                                          columns: const <
-                                                              DataColumn>[
+                                                          columns: const <DataColumn>[
                                                             DataColumn(
                                                                 label: Text(
                                                                     "Sl No")),
@@ -864,8 +863,7 @@ class _DistanceReportsScreenState extends State<DistanceReportsScreen> {
                                                                         2);
                                                               }
                                                               return DataRow(
-                                                                cells: <
-                                                                    DataCell>[
+                                                                cells: <DataCell>[
                                                                   DataCell(Text(
                                                                       "${index + 1}")),
                                                                   DataCell(Text(

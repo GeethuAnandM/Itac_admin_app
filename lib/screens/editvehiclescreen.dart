@@ -924,7 +924,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                                     : totDevices,
                                 // asyncItems: (String filter) =>
                                 //     filterdata(filter),
-                                onSaved: (VehicleDropNew? data) async {
+                                onSelected: (VehicleDropNew? data) async {
                                   if (data != null) {
                                     setState(() {
                                       // print("newvalue${vehicleNameselected!.id}");

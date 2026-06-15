@@ -1260,7 +1260,7 @@ class _OneWayState extends State<OneWay> {
   },
                                         // asyncItems: (String filter) =>
                                         //     filterTrip(filter),
-                                        onSaved: (Trips? data) async {
+                                        onSelected: (Trips? data) async {
                                           if (data != null) {
                                             setState(() {
                                               drivernames = data;

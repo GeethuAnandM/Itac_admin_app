@@ -771,7 +771,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                     },
                                     // asyncItems: (String filter) =>
                                     //     filterdata(filter),
-                                    onSaved: (VehicleDrop? data) async {
+                                    onSelected: (VehicleDrop? data) async {
                                       if (data != null) {
                                         setState(() {
                                           _vehicleNameselected = data;
