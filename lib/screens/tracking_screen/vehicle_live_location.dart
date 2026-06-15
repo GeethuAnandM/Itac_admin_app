@@ -943,7 +943,7 @@ class _CreateMapState extends State<CreateMap> {
                       SizedBox(
                           height: 500.0,
                           child: ListView.builder(
-                              itemCount: 5,
+                              itemCount: vehicleList.length,
                               itemBuilder: (context, index) {
                                 var lastReportedDateTime = dateFormatter(
                                     vehicleList[index]["packetTime"]);

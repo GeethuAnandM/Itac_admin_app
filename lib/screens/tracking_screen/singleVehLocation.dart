@@ -196,19 +196,21 @@ class CurrentLocationMapState extends State<CurrentLocationMap> {
                             title: "Speed: " + currentSpeed, snippet: vehName)),
                   },
                   onMapCreated: (mapController) {
+                     mapController
+                        .showMarkerInfoWindow(MarkerId(mId.toString()));
                     _controller.complete(mapController);
 
-                    WidgetsBinding.instance.addPostFrameCallback((_) async {
-                      await Future.delayed(
-                        const Duration(milliseconds: 1000),
-                      );
+                    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+                    //   await Future.delayed(
+                    //     const Duration(milliseconds: 1000),
+                    //   );
 
-                      try {
-                        mapController.showMarkerInfoWindow(mId);
-                      } catch (e) {
-                        print(e);
-                      }
-                    });
+                    //   try {
+                    //     mapController.showMarkerInfoWindow(mId);
+                    //   } catch (e) {
+                    //     print(e);
+                    //   }
+                    // });
                   },
                 );
               }),

@@ -13,7 +13,6 @@ import 'package:location/location.dart';
 import 'package:lottie/lottie.dart' as lottie;
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-
 class VehicleTracking extends StatefulWidget {
   Map<dynamic, dynamic> trackdata;
   VehicleTracking({super.key, required this.trackdata});
@@ -45,7 +44,8 @@ class _VehicleTrackingState extends State<VehicleTracking> {
   int currentspeed = normalspeed;
   Map<MarkerId, Marker> markers = {};
 
-  PolylinePoints polylinePoints = PolylinePoints(apiKey: 'AIzaSyBOuXqXGvHOEm4edTS0lOAaXHpR1k7guYM');
+  PolylinePoints polylinePoints =
+      PolylinePoints(apiKey: 'AIzaSyBOuXqXGvHOEm4edTS0lOAaXHpR1k7guYM');
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
   // Google Maps controller
@@ -527,6 +527,7 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                             rotateGesturesEnabled: true,
                             initialCameraPosition: _kGooglePlex!,
                             // myLocationEnabled: true,
+                            myLocationButtonEnabled: false,
                             tiltGesturesEnabled: true,
                             compassEnabled: true,
                             scrollGesturesEnabled: true,
@@ -538,6 +539,59 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                               _controller.complete(controller);
                             },
                           ),
+                        ),
+                        Positioned(
+                          right: 16,
+                          bottom: 360,
+                          child: Column(children: [
+                            Container(
+                              height: 40,
+                              width: 40,
+                              child: FloatingActionButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.7),
+                                child: Icon(
+                                  Icons.add,
+                                  size: 36,
+                                  color: Colors.grey.shade800,
+                                ),
+                                onPressed: () async {
+                                  final controller = await _controller.future;
+                                  zoomlevel++;
+                                  controller.animateCamera(
+                                    CameraUpdate.zoomTo(zoomlevel),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 1), // ← spacer
+                            Container(
+                              height: 40,
+                              width: 40,
+                              child: FloatingActionButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                backgroundColor:
+                                    Colors.white.withValues(alpha: 0.7),
+                                child: Icon(
+                                  Icons.remove,
+                                  size: 36,
+                                  color: Colors.grey.shade800,
+                                ),
+                                onPressed: () async {
+                                  final controller = await _controller.future;
+                                  zoomlevel--;
+                                  controller.animateCamera(
+                                    CameraUpdate.zoomTo(zoomlevel),
+                                  );
+                                },
+                              ),
+                            ),
+                          ]),
                         ),
                         Positioned(
                             left: 20,
@@ -611,19 +665,24 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                                                     locationanimation();
                                                   },
                                                   icon: Image(
+                                                    height: 40,
+                                                    width: 40,
                                                     image: AssetImage(
                                                         "images/play.png"),
                                                   ),
                                                 )
                                               : IconButton(
                                                   onPressed: () async {
-                                                    await WakelockPlus.disable();
+                                                    await WakelockPlus
+                                                        .disable();
                                                     pausetrack();
                                                     setState(() {
                                                       isPause = true;
                                                     });
                                                   },
                                                   icon: Image(
+                                                    height: 40,
+                                                    width: 40,
                                                     image: AssetImage(
                                                         "images/pause.png"),
                                                   ),
@@ -640,6 +699,8 @@ class _VehicleTrackingState extends State<VehicleTracking> {
                                               });
                                             },
                                             icon: Image(
+                                              height: 40,
+                                              width: 40,
                                               image: AssetImage(
                                                   "images/restart.png"),
                                             ),

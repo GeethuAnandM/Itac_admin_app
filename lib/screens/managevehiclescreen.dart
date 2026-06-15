@@ -777,12 +777,13 @@ class _ManageVehicleScreenState extends State<ManageVehicleScreen> {
         color: Color(0xFFEAEAEA),
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
+            shape: CircleBorder(),
             child: addButtonClicked
                 ? Center(
                     child: CircularProgressIndicator(
                     color: Colors.white,
                   ))
-                : Icon(Icons.add),
+                : Icon(Icons.add, color: Colors.white),
             onPressed: () async {
               setState(() {
                 addButtonClicked = true;
