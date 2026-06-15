@@ -127,25 +127,59 @@ class _EditTripScreenState extends State<EditTripScreen> {
   String? vehselected;
 
   Future<void> getVehicleName() async {
-    final prefs = await SharedPreferences.getInstance();
-    var userId = prefs.getString("user_id");
-    vehiclenames.clear();
-    final url = "${baseUrl}api/list-vehicles/$userId";
-    final result = await Dio().get(url);
-    for (int i = 0; i < result.data.length; i++) {
-      if (result.data[i]["vehicleId"] != null &&
-          result.data[i]["vehicleName"] != null) {
-        if (widget.vehicleId == result.data[i]["vehicleId"]) {
-          _vehicleNameselected = VehicleDrop(
-              result.data[i]["vehicleId"], result.data[i]["vehicleName"]);
-        }
-        vehiclenames.add(VehicleDrop(
-            result.data[i]["vehicleId"], result.data[i]["vehicleName"]));
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString("user_id");
+
+      if (userId == null || userId.isEmpty) {
+        print("User ID is null");
+        return;
       }
+
+      vehiclenames.clear();
+
+      final url = "${baseUrl}api/list-vehicles/$userId";
+      final result = await Dio().get(url);
+
+      if (result.statusCode == 200 && result.data is List) {
+        for (int i = 0; i < result.data.length; i++) {
+          if (result.data[i]["vehicleId"] != null &&
+              result.data[i]["vehicleName"] != null) {
+            if (widget.vehicleId == result.data[i]["vehicleId"]) {
+              _vehicleNameselected = VehicleDrop(
+                result.data[i]["vehicleId"],
+                result.data[i]["vehicleName"],
+              );
+            }
+
+            vehiclenames.add(
+              VehicleDrop(
+                result.data[i]["vehicleId"],
+                result.data[i]["vehicleName"],
+              ),
+            );
+          }
+        }
+
+        print(_vehicleNameselected?.name);
+        print(vehiclenames);
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      }
+    } on SocketException {
+      print("No Internet Connection");
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      setState(() {
+        errormessage = "No Internet Connection";
+      });
+    } catch (e, stackTrace) {
+      print("getVehicleName Error: $e");
+      print(stackTrace);
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      setState(() {
+        errormessage = "Something went wrong";
+      });
     }
-    // await getdriverName();
-    print(_vehicleNameselected?.name);
-    print(vehiclenames);
   }
 
   Future chkdrivername(dynamic drivername) async {
@@ -391,8 +425,8 @@ class _EditTripScreenState extends State<EditTripScreen> {
             .parse(returnEndTimeController.text)
             .subtract(Duration(hours: 5, minutes: 30));
         var retime = timeFormat.format(returnend);
-        DateTime restartdate = DateFormat("dd-MM-yyyy")
-            .parse(returnStartDateController.text);
+        DateTime restartdate =
+            DateFormat("dd-MM-yyyy").parse(returnStartDateController.text);
         var resdate = dateFormat1.format(restartdate);
         DateTime reenddate =
             DateFormat("dd-MM-yyyy").parse(returnEndDateController.text);
@@ -717,12 +751,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   child: DropdownSearch<VehicleDrop>(
-                                    compareFn: (item1, item2) => item1.id == item2.id,
+                                    compareFn: (item1, item2) =>
+                                        item1.id == item2.id,
                                     selectedItem: _vehicleNameselected,
                                     decoratorProps:
                                         const DropDownDecoratorProps(
-                                            decoration:
-                                                InputDecoration(
+                                            decoration: InputDecoration(
                                       hintText: 'Select Vehicle Name',
                                       hintStyle: TextStyle(color: Colors.black),
                                     )),
@@ -733,8 +767,8 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                                     "Select Vehicle Name")),
                                         showSearchBox: true),
                                     items: (filter, loadProps) async {
-    return vehiclenames;
-  },
+                                      return vehiclenames;
+                                    },
                                     // asyncItems: (String filter) =>
                                     //     filterdata(filter),
                                     onSaved: (VehicleDrop? data) async {
@@ -769,12 +803,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                       borderRadius: BorderRadius.all(
                                           Radius.circular(10))),
                                   child: DropdownSearch<Trips>(
-                                    compareFn: (item1, item2) => item1.id == item2.id,
+                                    compareFn: (item1, item2) =>
+                                        item1.id == item2.id,
                                     selectedItem: _driverNameselected,
                                     decoratorProps:
                                         const DropDownDecoratorProps(
-                                            decoration:
-                                                InputDecoration(
+                                            decoration: InputDecoration(
                                       hintText: 'Select Driver Name',
                                       hintStyle: TextStyle(color: Colors.black),
                                     )),
@@ -787,11 +821,11 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                                     "Select Driver Name")),
                                         showSearchBox: true),
                                     items: (filter, loadProps) async {
-                                         return totTrip;
-                                      },
+                                      return totTrip;
+                                    },
                                     // asyncItems: (String filter) =>
                                     //     filterTrip(filter),
-                                  onSelected: (Trips? data) async {
+                                    onSelected: (Trips? data) async {
                                       if (data != null) {
                                         setState(() {
                                           _driverNameselected = data;

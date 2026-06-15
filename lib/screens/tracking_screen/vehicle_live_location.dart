@@ -37,6 +37,7 @@ var loader = true;
 var listOfDeviceLocation = [];
 List<Place> items = [];
 String _searchResult = '';
+double currentZoom = 6.5;
 
 var searchController = TextEditingController();
 String snackBarMessage = "Sharing failed - check connection or data";
@@ -903,7 +904,7 @@ class _CreateMapState extends State<CreateMap> {
       child: Stack(
         children: [
           Positioned.fill(
-              bottom: MediaQuery.of(context).size.height * 0.18,
+              bottom: MediaQuery.of(context).size.height * 0.15,
               child: CreateClusterMap(clusterData)),
           Positioned.fill(
               child: DraggableScrollableSheet(
@@ -1102,28 +1103,85 @@ class CreateClusterMapState extends State<CreateClusterMap> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-          mapType: MapType.normal,
-          rotateGesturesEnabled: true,
-          // myLocationEnabled: true,
-          tiltGesturesEnabled: true,
-          compassEnabled: true,
-          scrollGesturesEnabled: true,
-          zoomGesturesEnabled: true,
-          initialCameraPosition: CameraPosition(
-            target: camPosition,
-            zoom: 6.5,
-          ),
-          markers: markers,
-          onMapCreated: (GoogleMapController controller) {
-            print("MAP CREATED");
-            _controller.complete(controller);
-            print("MAP CONTROLLER COMPLETE");
-            _manager.setMapId(controller.mapId);
-            print("MAP ID SET");
-          },
-          onCameraMove: _manager.onCameraMove,
-          onCameraIdle: _manager.updateMap),
+      body: Stack(children: [
+        GoogleMap(
+            mapType: MapType.normal,
+            rotateGesturesEnabled: true,
+            // myLocationEnabled: true,
+            myLocationButtonEnabled: false,
+            tiltGesturesEnabled: true,
+            compassEnabled: true,
+            scrollGesturesEnabled: true,
+            zoomGesturesEnabled: true,
+            initialCameraPosition: CameraPosition(
+              target: camPosition,
+              zoom: 6.5,
+            ),
+            markers: markers,
+            onMapCreated: (GoogleMapController controller) {
+              print("MAP CREATED");
+              _controller.complete(controller);
+              print("MAP CONTROLLER COMPLETE");
+              _manager.setMapId(controller.mapId);
+              print("MAP ID SET");
+            },
+            onCameraMove: (CameraPosition position) {
+              currentZoom = position.zoom;
+              _manager.onCameraMove(position);
+            },
+            onCameraIdle: _manager.updateMap),
+        Positioned(
+          right: 16,
+          bottom: 20,
+          child: Column(children: [
+            Container(
+              height: 30,
+              width: 30,
+              child: FloatingActionButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                backgroundColor: Colors.white,
+                child: const Icon(
+                  Icons.add,
+                  size: 28,
+                  color: Colors.grey,
+                ),
+                onPressed: () async {
+                  final controller = await _controller.future;
+                  currentZoom++;
+                  controller.animateCamera(
+                    CameraUpdate.zoomTo(currentZoom),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8), // ← spacer
+            Container(
+              height: 30,
+              width: 30,
+              child: FloatingActionButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                backgroundColor: Colors.white,
+                child: const Icon(
+                  Icons.remove,
+                  size: 28,
+                  color: Colors.grey,
+                ),
+                onPressed: () async {
+                  final controller = await _controller.future;
+                  currentZoom--;
+                  controller.animateCamera(
+                    CameraUpdate.zoomTo(currentZoom),
+                  );
+                },
+              ),
+            ),
+          ]),
+        ),
+      ]),
     );
   }
 

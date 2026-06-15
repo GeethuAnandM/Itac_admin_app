@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 
-
 ThemeData? activeTheme;
 
 final blueAndIndigoTheme = ThemeData(
   appBarTheme: const AppBarTheme(
-  backgroundColor: Colors.blue,
-  iconTheme: IconThemeData(color: Colors.white),
-  foregroundColor: Colors.white,
-),
-  floatingActionButtonTheme:FloatingActionButtonThemeData(
-      backgroundColor:Colors.indigo
-  ) ,
+    backgroundColor: Colors.blue,
+    iconTheme: IconThemeData(color: Colors.white),
+    foregroundColor: Colors.white,
+  ),
+  secondaryHeaderColor: Colors.white,
+  canvasColor: Colors.white,
+  cardColor: Colors.white,
+  floatingActionButtonTheme:
+      FloatingActionButtonThemeData(backgroundColor: Colors.indigo),
   buttonTheme: ButtonThemeData(
     buttonColor: Colors.indigo,
   ),
@@ -23,7 +24,7 @@ final blueAndIndigoTheme = ThemeData(
   // scaffoldBackgroundColor: Colors.blue,
   iconTheme: IconThemeData(color: Colors.blue),
   primaryColor: Colors.blue,
-  primarySwatch:Colors.blue,
+  primarySwatch: Colors.blue,
   brightness: Brightness.light,
   scaffoldBackgroundColor: Colors.white,
   textTheme: TextTheme(
@@ -41,13 +42,13 @@ final blueAndIndigoTheme = ThemeData(
     bodySmall: TextStyle(color: Colors.black),
   ),
 );
- 
+
 final deepPurpleAndAmberTheme = ThemeData(
-    appBarTheme: const AppBarTheme(
-  backgroundColor: Colors.deepPurple,
-  iconTheme: IconThemeData(color: Colors.white),
-  foregroundColor: Colors.white,
-),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.deepPurple,
+    iconTheme: IconThemeData(color: Colors.white),
+    foregroundColor: Colors.white,
+  ),
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.deepPurple,
     primary: Colors.deepPurple,
@@ -81,7 +82,7 @@ final deepPurpleAndAmberTheme = ThemeData(
     bodySmall: TextStyle(color: Colors.black),
   ),
 );
- 
+
 final pinkAndBlueGreyTheme = ThemeData(
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.pink,
@@ -120,13 +121,13 @@ final pinkAndBlueGreyTheme = ThemeData(
     bodySmall: TextStyle(color: Colors.black),
   ),
 );
- 
+
 final indigoAndPinkTheme = ThemeData(
-      appBarTheme: const AppBarTheme(
-  backgroundColor: Colors.indigo,
-  iconTheme: IconThemeData(color: Colors.white),
-  //foregroundColor: Colors.white,
-),
+  appBarTheme: const AppBarTheme(
+    backgroundColor: Colors.indigo,
+    iconTheme: IconThemeData(color: Colors.white),
+    //foregroundColor: Colors.white,
+  ),
   colorScheme: ColorScheme.fromSeed(
     seedColor: Colors.indigo,
     primary: Colors.indigo,

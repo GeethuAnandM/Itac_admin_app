@@ -12,7 +12,8 @@ import GoogleMaps
 
     print("🚀 APP DELEGATE CALLED")
 
-    let result = GMSServices.provideAPIKey("AIzaSyBTkhSkL9nyLR_NH5zJFEw-0X-bVg1jp_0")
+    //let result = GMSServices.provideAPIKey("AIzaSyBTkhSkL9nyLR_NH5zJFEw-0X-bVg1jp_0")
+    let result = GMSServices.provideAPIKey("AIzaSyCHPaQI4Y4Lm9NZdSXXt3W4l_qqKAHM5x0")
     print("Google Maps Key Result: \(result)")
 
     GeneratedPluginRegistrant.register(with: self)

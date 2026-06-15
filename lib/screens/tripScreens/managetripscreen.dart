@@ -513,6 +513,7 @@ class _manageTripScreenState extends State<manageTripScreen> {
             color: const Color(0xFFEAEAEA),
             child: Scaffold(
                 floatingActionButton: FloatingActionButton(
+                  shape: CircleBorder(),
                   child: const Icon(
                     Icons.add,
                     color: commonTextStyle,
@@ -1110,6 +1111,7 @@ class _manageTripScreenState extends State<manageTripScreen> {
                                                             DateTime reactualenddate = DateFormat("dd-MM-yyyy HH:mm").parse(dataOfTripsList[index]['returnActualEndTime']);
                                                             reactualedate = dateFormat1.format(reactualenddate);
                                                           }
+                                                          ScaffoldMessenger.of(context).clearSnackBars();
                                                           loader == true
                                                               ? Center(child: CircularProgressIndicator())
                                                               : Navigator.push(
