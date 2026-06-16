@@ -1,6 +1,7 @@
 import 'package:admin_app/api/api.dart';
 import 'package:admin_app/languges/language_model.dart';
 import 'package:admin_app/main.dart';
+import 'package:admin_app/screens/notificationscreen.dart';
 import 'package:admin_app/screens/reportsscreen.dart';
 import 'package:admin_app/screens/tracking_screen/track_trip_screen.dart';
 import 'package:dio/dio.dart';
@@ -331,24 +332,24 @@ class _NavBarState extends State<NavBar> {
                           )),
                 );
               }),
-          // ListTile(
-          //   leading: Icon(
-          //     Icons.notifications,
-          //     color: blackColor,
-          //   ),
-          //   title: Text(
-          //     translation(context).notification,
-          //     // "Notifications",
-          //     style: TextStyle(fontWeight: FontWeight.w900),
-          //   ),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //           builder: (context) => const NotificationScreen()),
-          //     );
-          //   },
-          // ),
+          ListTile(
+            leading: Icon(
+              Icons.notifications,
+              color: blackColor,
+            ),
+            title: Text(
+              translation(context).notification,
+              // "Notifications",
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NotificationScreen()),
+              );
+            },
+          ),
           ListTile(
               leading: Icon(
                 Icons.account_circle_rounded,

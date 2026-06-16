@@ -13,17 +13,21 @@ List<dynamic> ListNoti = [];
 List<dynamic> usersFiltered = [];
 List<dynamic> results = [];
 var dateTime;
+
 getNotification() async {
   final prefs = await SharedPreferences.getInstance();
   var userId = prefs.getString("user_id");
   var orgId = prefs.getString("org_id");
   final url = "${baseUrl}notifications/list-notification/$userId/$orgId";
-  //show error message try catchqerwko
+
   var dio = Dio();
   final response = await dio.get(url);
-  // print("resp:${response.data}");
+
   notification.value.clear();
+  usersFiltered.clear();
+
   print(response.data);
+
   notification.value.addAll(response.data);
   notification.notifyListeners();
   usersFiltered.addAll(response.data);
@@ -40,100 +44,91 @@ class NotificationScreen extends StatefulWidget {
 }
 
 class _NotificationScreenState extends State<NotificationScreen> {
+  String _safeText(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+
+    final text = value.toString().trim();
+    return text == 'null' ? '' : text;
+  }
+
+  String _displayText(dynamic value) {
+    final text = _safeText(value);
+    return text.isEmpty ? '---' : text;
+  }
+
+  String _eventDetailValue(dynamic eventDetail, String key) {
+    if (eventDetail is Map && eventDetail[key] != null) {
+      return _safeText(eventDetail[key]);
+    }
+    return '';
+  }
+
+  String _eventDetailText(dynamic eventDetail) {
+    final date = _eventDetailValue(eventDetail, 'date');
+    final time = _eventDetailValue(eventDetail, 'time');
+    final combined = [date, time].where((part) => part.isNotEmpty).join(' ');
+    return combined.isEmpty ? '---' : combined;
+  }
+
+  bool _matchesSearch(dynamic value, String enteredKeyword) {
+    final normalizedValue = _safeText(value).toLowerCase().replaceAll(" ", "");
+    final normalizedKeyword =
+        enteredKeyword.toLowerCase().replaceAll(" ", "");
+    return normalizedValue.contains(normalizedKeyword);
+  }
+
   @override
   void initState() {
     () async {
-      getNotification();
+      await getNotification();
+
       print(ListNoti.length);
       print(usersFiltered);
+
       setState(() {
         loader = false;
+        ListNoti = usersFiltered;
       });
-      // setState(() {
-      ListNoti = usersFiltered;
-      // });
     }();
     super.initState();
   }
 
   void _runFilter(dynamic enteredKeyword) {
     print("list data $usersFiltered");
+
     if (enteredKeyword.isEmpty) {
       setState(() {
         results = usersFiltered;
-        // usersFiltered = results;
       });
     } else {
-      // print("list data $usersFiltered");
-      results = usersFiltered
-          .where((person) =>
-              person['title']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['alertId']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['eventDetail']['license_plate']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['eventDetail']['trip_name']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['eventDetail']['vehicle_name']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['imei']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['priority']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['eventDetail']['location']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['message']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase().replaceAll(" ", "")) ||
-              person['priority']
-                  .toString()
-                  .toLowerCase()
-                  .replaceAll(" ", "")
-                  .contains(enteredKeyword.toLowerCase()))
-          .toList();
-      // if (results.isEmpty) {
-      //   setState(() {
-      //     loader = true;
-      //   });
-      // } else {
-      //   setState(() {
-      //     loader = false;
-      //   });
-      // }
+      results = usersFiltered.where((person) {
+        final eventDetail = person['eventDetail'];
+
+        return _matchesSearch(person['title'], enteredKeyword) ||
+            _matchesSearch(person['alertId'], enteredKeyword) ||
+            _matchesSearch(
+                _eventDetailValue(eventDetail, 'license_plate'),
+                enteredKeyword) ||
+            _matchesSearch(
+                _eventDetailValue(eventDetail, 'trip_name'), enteredKeyword) ||
+            _matchesSearch(_eventDetailValue(eventDetail, 'vehicle_name'),
+                enteredKeyword) ||
+            _matchesSearch(person['imei'], enteredKeyword) ||
+            _matchesSearch(person['priority'], enteredKeyword) ||
+            _matchesSearch(
+                _eventDetailValue(eventDetail, 'location'), enteredKeyword) ||
+            _matchesSearch(person['message'], enteredKeyword);
+      }).toList();
     }
 
-    // Refresh the UI
     notification.value.clear();
     notification.value.addAll(results);
     notification.notifyListeners();
+
     print("not data ${notification.value}");
+
     setState(() {
       ListNoti = results;
     });
@@ -161,13 +156,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
             elevation: 0.0),
         backgroundColor: Colors.white.withOpacity(0.90),
         body: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
-          // crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-              // height: MediaQuery.of(context).size.height * .06,
-              // width: 95.w,
-              // padding: EdgeInsets.fromLTRB(10, 5, 10, 5),
               decoration: BoxDecoration(
                 color: searchBoxColorWhite,
                 borderRadius: BorderRadius.all(Radius.circular(5)),
@@ -181,7 +171,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           setState(() {
                             searchController.clear();
                             _searchResult = '';
+                            notification.value.clear();
                             notification.value.addAll(usersFiltered);
+                            notification.notifyListeners();
                           });
                         },
                         child: Icon(Icons.cancel)),
@@ -216,21 +208,23 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 itemCount: data.length,
                                 itemBuilder: (context, index) {
                                   final value = data[index];
-                                  // print("Value is ${value}");
 
                                   if (value["eventDetail"] != null) {
                                     if (value["eventDetail"]["eventTime"] !=
                                         null) {
                                       DateTime? eventTime = DateTime.tryParse(
                                           value["eventDetail"]["eventTime"]);
-                                      dateTime =
-                                          DateFormat('yyyy-MM-dd HH:mm:ss a')
-                                              .format(eventTime!);
+                                      if (eventTime != null) {
+                                        dateTime =
+                                            DateFormat('yyyy-MM-dd HH:mm:ss a')
+                                                .format(eventTime);
+                                      }
                                     }
                                   } else {
                                     print(
                                         "Event Detail : ${value["eventDetail"]}");
                                   }
+
                                   return Container(
                                     padding: EdgeInsets.fromLTRB(9, 10, 0, 10),
                                     decoration: BoxDecoration(
@@ -293,8 +287,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                                     FontWeight
                                                                         .w600),
                                                           ))),
-
-
                                                 ]),
                                             subtitle: Container(
                                                 padding:
@@ -341,14 +333,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                                   FontWeight
                                                                       .w400,
                                                             )),
-                                                        Text(value["eventDetail"] !=
-                                                                null
-                                                            ? value["eventDetail"]
-                                                                    ["date"] +
-                                                                " " +
-                                                                value["eventDetail"]
-                                                                    ["time"]
-                                                            : "---"),
+                                                        Text(_eventDetailText(
+                                                            value["eventDetail"])),
                                                       ]),
                                                       SizedBox(
                                                         height: 7,
@@ -356,140 +342,96 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                                       Row(children: [
                                                         Icon(
                                                           Icons
-                                                              .date_range_rounded,size: 20,
+                                                              .date_range_rounded,
+                                                          size: 20,
                                                           color: Color(
                                                               0xFF0765CB),
                                                         ),
-                                                        SizedBox(width: 3,),
+                                                        SizedBox(
+                                                          width: 3,
+                                                        ),
                                                         Text(
-                                                          value["timeOfAlert"] ??
-                                                              "---",
+                                                            _displayText(
+                                                                value["timeOfAlert"]),
                                                             style: TextStyle(
                                                               fontSize: 16.5,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .w400,
+                                                                  FontWeight
+                                                                      .w400,
                                                             )),
-                                                        SizedBox(width: 6,),
-                                                          Text(
-                                                            value['priority'] ??
-                                                                "---",
-                                                              style: TextStyle(
-                                                                fontSize: 16.5,
-                                                                fontWeight:
-                                                                FontWeight
-                                                                    .w400,
-                                                              color: value[
-                                                              'priority'] ==
-                                                                  "CRITICAL"
-                                                                  ? Color(
-                                                                  0xFF9A3434)
-                                                                  : value['priority'] ==
-                                                                  "HIGH"
-                                                                  ? Color(
-                                                                0xFFFA822B,
-                                                              )
-                                                                  : value['priority'] ==
-                                                                  "MEDIUM"
-                                                                  ? Color(
-                                                                0xFFF36969,
-                                                              )
-                                                                  : Color(
-                                                                0xFFDFC22B,
-                                                              ),
-                                                            ),
+                                                        SizedBox(
+                                                          width: 6,
+                                                        ),
+                                                        Text(
+                                                          _displayText(
+                                                              value['priority']),
+                                                          style: TextStyle(
+                                                            fontSize: 16.5,
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            color: value[
+                                                                        'priority'] ==
+                                                                    "CRITICAL"
+                                                                ? Color(
+                                                                    0xFF9A3434)
+                                                                : value['priority'] ==
+                                                                        "HIGH"
+                                                                    ? Color(
+                                                                        0xFFFA822B,
+                                                                      )
+                                                                    : value['priority'] ==
+                                                                            "MEDIUM"
+                                                                        ? Color(
+                                                                            0xFFF36969,
+                                                                          )
+                                                                        : Color(
+                                                                            0xFFDFC22B,
+                                                                          ),
                                                           ),
-                                                          // SizedBox(
-                                                          //   width: 6,
-                                                          // ),
-                                                          // Container(
-                                                          //     child: IconButton(
-                                                          //         onPressed: () {},
-                                                          //         icon: Icon(
-                                                          //           Icons.play_circle_fill,
-                                                          //           size: 25,
-                                                          //           color: Colors.orange,
-
+                                                        ),
                                                       ]),
                                                       SizedBox(
                                                         height: 7,
                                                       ),
-                                                      // Row(children: [
-                                                      //   Text("Trip:"),
-                                                      //   Text(value["eventDetail"] !=
-                                                      //           null
-                                                      //       ? value["eventDetail"]
-                                                      //               ["trip_id"]
-                                                      //           .toString()
-                                                      //       : "---"),
-                                                      //   Text(" - "),
-                                                      //   Text(
-                                                      //       value["eventDetail"] != null
-                                                      //           ? value["eventDetail"]
-                                                      //               ["trip_name"]
-                                                      //           : "---"),
-                                                      // ]),
-                                                      // SizedBox(
-                                                      //   height: 7,
-                                                      // ),
-                                                      // Row(children: [
-                                                      //   Text("Vehicle Name: "),
-                                                      //   Text(
-                                                      //       value["eventDetail"] != null
-                                                      //           ? value["eventDetail"]
-                                                      //               ["vehicle_name"]
-                                                      //           : "---"),
-                                                      // ]),
-                                                      // Row(children: [
-                                                      //   Text("Plate: "),
-                                                      //   Text(value["eventDetail"] !=
-                                                      //           null
-                                                      //       ? value["eventDetail"]
-                                                      //               ["license_plate"]
-                                                      //           .toString()
-                                                      //       : "---"),
-                                                      // ]),
-                                                      // Row(children: [
-                                                      //   Text("Device IEMI: "),
-                                                      //   Text(
-                                                      //     value['imei'] ?? "---",
-                                                      //   ),
-                                                      // ]),
                                                       Row(children: [
-                                                        Text("Location: ", style: TextStyle(
-                                                          fontSize: 16.5,
-                                                          fontWeight:
-                                                          FontWeight
-                                                              .w400,
-                                                        )),
+                                                        Text("Location: ",
+                                                            style: TextStyle(
+                                                              fontSize: 16.5,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                            )),
                                                         Expanded(
-                                                          child: Text(value[
-                                                                      "eventDetail"] !=
-                                                                  null
-                                                              ? value["eventDetail"]
-                                                                  ["location"]
-                                                              : "---"),
+                                                          child: Text(_displayText(
+                                                              _eventDetailValue(
+                                                                  value["eventDetail"],
+                                                                  "location"))),
                                                         ),
                                                       ]),
                                                       Row(
-                                                        mainAxisAlignment: MainAxisAlignment.end,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
                                                         children: [
-                                                          value['isRead'] == true
-                                                              ?  Image.asset("images/double-check.png",width: 20,height: 20,)
+                                                          value['isRead'] ==
+                                                                  true
+                                                              ? Image.asset(
+                                                                  "images/double-check.png",
+                                                                  width: 20,
+                                                                  height: 20,
+                                                                )
                                                               : Card(
-                                                              color: Colors.white,
-                                                              child: Text(
-                                                                "",
-                                                                style: TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                              )),
+                                                                  color: Colors
+                                                                      .white,
+                                                                  child: Text(
+                                                                    "",
+                                                                    style: TextStyle(
+                                                                        color: Colors
+                                                                            .white),
+                                                                  )),
                                                         ],
                                                       )
                                                     ]))),
-                                        // SizedBox(
-                                        //   height: 10,
-                                        // ),
                                       ],
                                     ),
                                   );

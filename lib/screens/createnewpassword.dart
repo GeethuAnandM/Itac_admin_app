@@ -288,8 +288,15 @@ class _CreatenewPasswordState extends State<CreatenewPassword> {
                                     setState(() {
                                       EasyLoading.dismiss();
                                     });
-                                    showSnackBar(
-                                        "Password Changed Successfully");
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            "Password Changed Successfully"),
+                                        duration: Duration(seconds: 2),
+                                      ),
+                                    );
+                                    await Future.delayed(
+                                        const Duration(seconds: 2));
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(

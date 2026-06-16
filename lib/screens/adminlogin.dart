@@ -134,15 +134,10 @@ class _AdminLoginState extends State<AdminLogin> {
   }
 
   void _handleRemeberme(bool value) {
-    print("Handle Rember Me");
-    _isChecked = value;
-    SharedPreferences.getInstance().then(
-      (prefs) {
-        prefs.setBool("remember_me", value);
-        prefs.setString('email', fieldController.text);
-        prefs.setString('password', passwordController.text);
-      },
-    );
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool("remember_me", value);
+    });
+
     setState(() {
       _isChecked = value;
     });
@@ -331,8 +326,7 @@ class _AdminLoginState extends State<AdminLogin> {
                                                                 key:
                                                                     LoginFormKey,
                                                                 child: Column(
-                                                                    children: <
-                                                                        Widget>[
+                                                                    children: <Widget>[
                                                                       TextFormField(
                                                                         // autovalidateMode:
                                                                         //     AutovalidateMode
@@ -560,6 +554,24 @@ class _AdminLoginState extends State<AdminLogin> {
                                                                               "Successfully logged in") {
                                                                             message =
                                                                                 " ";
+                                                                            if (_isChecked) {
+                                                                              final prefs = await SharedPreferences.getInstance();
+
+                                                                              await prefs.setString(
+                                                                                "email",
+                                                                                fieldController.text.trim(),
+                                                                              );
+
+                                                                              await prefs.setString(
+                                                                                "password",
+                                                                                passwordController.text,
+                                                                              );
+
+                                                                              await prefs.setBool(
+                                                                                "remember_me",
+                                                                                true,
+                                                                              );
+                                                                            }
                                                                             Navigator.pushReplacement(
                                                                               context,
                                                                               MaterialPageRoute(builder: (context) => Dashboard()),
