@@ -581,7 +581,7 @@ class _AdminLoginState extends State<AdminLogin> {
                                                                             8,
                                                                       ),
                                                                       Text(
-                                                                        "All rights reserved © 2022 cogniphi.com",
+                                                                        "All rights reserved © ${DateTime.now().year} cogniphi.com",
                                                                         style:
                                                                             TextStyle(
                                                                           color:

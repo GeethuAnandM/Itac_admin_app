@@ -293,105 +293,145 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: [SystemUiOverlay.bottom]);
-    return SafeArea(
-        child: Scaffold(
-            key: _key,
-            drawer: NavBar(),
-            appBar: PreferredSize(
-                preferredSize: Size.fromHeight(60.0),
-                child: AppBar(
-                  centerTitle: true,
-                  leading: Padding(
-                      padding: EdgeInsets.only(top: 15), child: _appBar()),
-                  title: Padding(
-                      padding: EdgeInsets.only(top: 20, left: 15),
-                      child: Text(
-                        translation(context).dashBoard,
-                        overflow: TextOverflow.visible,
-                      )),
-                  elevation: 0,
-                  actions: [
-                    DropdownButton<Language>(
-                      underline: const SizedBox(),
-                      icon: Padding(
-                        padding: EdgeInsets.only(top: 25, right: 20),
-                        child: Icon(
-                          Icons.language,
-                          size: 27,
-                          color: Colors.white,
-                        ),
-                      ),
-                      onChanged: (Language? language) async {
-                        if (language != null) {
-                          // print(language.name);
-                          Locale _locale =
-                              await setLocale(language.languageCode);
-                          AdminApp.setLocale(context, _locale);
-                        }
-                      },
-                      items: Language.languageList()
-                          .map<DropdownMenuItem<Language>>(
-                            (e) => DropdownMenuItem<Language>(
-                              value: e,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  Text(
-                                    e.flag,
-                                    style: const TextStyle(fontSize: 30),
-                                  ),
-                                  Text(e.name)
-                                ],
+    return Scaffold(
+        key: _key,
+        drawer: NavBar(),
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(60.0),
+            child: AppBar(
+              centerTitle: true,
+              leading:
+                  Padding(padding: EdgeInsets.only(top: 15), child: _appBar()),
+              title: Padding(
+                  padding: EdgeInsets.only(top: 20, left: 15),
+                  child: Text(
+                    translation(context).dashBoard,
+                    overflow: TextOverflow.visible,
+                  )),
+              elevation: 0,
+              actions: [
+                DropdownButton<Language>(
+                  underline: const SizedBox(),
+                  icon: Padding(
+                    padding: EdgeInsets.only(top: 25, right: 20),
+                    child: Icon(
+                      Icons.language,
+                      size: 27,
+                      color: Colors.white,
+                    ),
+                  ),
+                  onChanged: (Language? language) async {
+                    if (language != null) {
+                      // print(language.name);
+                      Locale _locale = await setLocale(language.languageCode);
+                      AdminApp.setLocale(context, _locale);
+                    }
+                  },
+                  items: Language.languageList()
+                      .map<DropdownMenuItem<Language>>(
+                        (e) => DropdownMenuItem<Language>(
+                          value: e,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: <Widget>[
+                              Text(
+                                e.flag,
+                                style: const TextStyle(fontSize: 30),
                               ),
-                            ),
-                          )
-                          .toList(),
+                              Text(e.name)
+                            ],
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+            )),
+        body: isError == true
+            ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    LottieBuilder.asset(
+                      "images/82529-no-network.json",
                     ),
+                    Text(errormessage ?? "No Internet connection"),
                   ],
-                )),
-            body: isError == true
-                ? Center(
+                ),
+              )
+            :
+            // : loading == true
+            // ? Center(child: CircularProgressIndicator()) :
+            SingleChildScrollView(
+                child: Center(
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        LottieBuilder.asset(
-                          "images/82529-no-network.json",
-                        ),
-                        Text(errormessage ?? "No Internet connection"),
-                      ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                    Divider(
+                      height: 1,
+                      thickness: 10,
+                      color: blackColor,
                     ),
-                  )
-                :
-                // : loading == true
-                // ? Center(child: CircularProgressIndicator()) :
-                SingleChildScrollView(
-                    child: Center(
-                        child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                        Divider(
-                          height: 1,
-                          thickness: 10,
-                          color: blackColor,
-                        ),
-                        Lists.isEmpty
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                    top: 5.0, left: 5, right: 5),
-                                child: Card(
-                                    elevation: 10,
-                                    color: Colors.white,
-                                    child: Padding(
-                                        padding: EdgeInsets.all(3),
-                                        child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                    Lists.isEmpty
+                        ? Padding(
+                            padding:
+                                EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                            child: Card(
+                                elevation: 10,
+                                color: Colors.white,
+                                child: Padding(
+                                    padding: EdgeInsets.all(3),
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            height: 3,
+                                          ),
+                                          Text(
+                                            'Vehicle Status',
+                                            style: TextStyle(
+                                                fontSize: 25,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          Text(DateFormat.yMMMEd()
+                                              .format(DateTime.now())),
+                                          SizedBox(
+                                            height: 5,
+                                          ),
+                                          SizedBox(
+                                            height: 150,
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              "Retrieving Vehicles Data",
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 150,
+                                          ),
+                                        ]))))
+                        : StreamBuilder(
+                            stream: getNumbers(const Duration(seconds: 10)),
+                            initialData: Lists,
+                            builder: (context, snapshot) {
+                              return Padding(
+                                  padding: EdgeInsets.only(
+                                      top: 5.0, right: 5, left: 5),
+                                  child: Card(
+                                      elevation: 10,
+                                      color: Colors.white,
+                                      child: Padding(
+                                          padding: EdgeInsets.all(3),
+                                          child: Column(
                                             children: [
-                                              SizedBox(
-                                                height: 3,
-                                              ),
                                               Text(
                                                 'Vehicle Status',
                                                 style: TextStyle(
@@ -407,271 +447,222 @@ class _DashboardState extends State<Dashboard> {
                                               SizedBox(
                                                 height: 5,
                                               ),
-                                              SizedBox(
-                                                height: 150,
-                                              ),
-                                              Center(
-                                                child: Text(
-                                                  "Retrieving Vehicles Data",
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 150,
-                                              ),
-                                            ]))))
-                            : StreamBuilder(
-                                stream: getNumbers(const Duration(seconds: 10)),
-                                initialData: Lists,
-                                builder: (context, snapshot) {
-                                  return Padding(
-                                      padding: EdgeInsets.only(
-                                          top: 5.0, right: 5, left: 5),
-                                      child: Card(
-                                          elevation: 10,
-                                          color: Colors.white,
-                                          child: Padding(
-                                              padding: EdgeInsets.all(3),
-                                              child: Column(
-                                                children: [
-                                                  Text(
-                                                    'Vehicle Status',
-                                                    style: TextStyle(
-                                                        fontSize: 25,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Text(DateFormat.yMMMEd()
-                                                      .format(DateTime.now())),
-                                                  SizedBox(
-                                                    height: 5,
-                                                  ),
-                                                  Container(
-                                                    width: 450,
-                                                    height: 350,
-                                                    // margin: EdgeInsets.only(top: 15),
-                                                    child:
-                                                        Piechart(Lists: Lists),
-                                                    // color: commonTextStyle,
-                                                  ),
-                                                  Row(children: [
-                                                    Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 109)),
-                                                    Text(
-                                                      'Moving:${Lists[0].MovingCount.toString()}',
-                                                      style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 39,
-                                                    ),
-                                                    Text(
-                                                      'Stopped:${Lists[0].StoppedCount.toString()}',
-                                                      style: TextStyle(
-                                                          fontSize: 11,
-                                                          fontWeight:
-                                                              FontWeight.w600),
-                                                    ),
-                                                  ]),
-                                                ],
-                                              ))));
-                                }),
-                        _dashtripList.isEmpty
-                            ? Padding(
-                                padding: EdgeInsets.only(
-                                    top: 5.0, left: 5, right: 5),
-                                child: Card(
-                                    elevation: 10,
-                                    color: Colors.white,
-                                    child: Padding(
-                                        padding: EdgeInsets.all(3),
-                                        child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.start,
-                                            children: [
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              Text(
-                                                'Trips Overview',
-                                                style: TextStyle(
-                                                    fontSize: 25,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              Text(DateFormat.yMMMEd()
-                                                  .format(DateTime.now())),
-                                              SizedBox(
-                                                height: 3,
-                                              ),
-                                              SizedBox(
-                                                height: 150,
-                                              ),
-                                              Center(
-                                                child: Text(
-                                                  "Retrieving Trip Data",
-                                                  style: TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                height: 150,
-                                              ),
-                                            ]))))
-                            : Padding(
-                                padding: EdgeInsets.only(
-                                    top: 5.0, left: 5, right: 5),
-                                child: Card(
-                                    elevation: 10,
-                                    color: Colors.white,
-                                    child: Padding(
-                                        padding: EdgeInsets.all(3),
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: 3,
-                                            ),
-                                            Text(
-                                              'Trips Overview',
-                                              style: TextStyle(
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                            Text(DateFormat.yMMMEd()
-                                                .format(DateTime.now())),
-                                            SizedBox(
-                                              height: 3,
-                                            ),
-                                            Container(
+                                              Container(
                                                 width: 450,
                                                 height: 350,
-                                                child: stackedColumn(
-                                                  dashtripList: _dashtripList,
-                                                  completed: _completed,
-                                                  planned: _planned,
-                                                  unplanned: _unplanned,
-                                                )),
-                                            Text(
-                                              "Total Trips:${total_trips}",
+                                                // margin: EdgeInsets.only(top: 15),
+                                                child: Piechart(Lists: Lists),
+                                                // color: commonTextStyle,
+                                              ),
+                                              Row(children: [
+                                                Padding(
+                                                    padding: EdgeInsets.only(
+                                                        left: 109)),
+                                                Text(
+                                                  'Moving:${Lists[0].MovingCount.toString()}',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                                SizedBox(
+                                                  width: 39,
+                                                ),
+                                                Text(
+                                                  'Stopped:${Lists[0].StoppedCount.toString()}',
+                                                  style: TextStyle(
+                                                      fontSize: 11,
+                                                      fontWeight:
+                                                          FontWeight.w600),
+                                                ),
+                                              ]),
+                                            ],
+                                          ))));
+                            }),
+                    _dashtripList.isEmpty
+                        ? Padding(
+                            padding:
+                                EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                            child: Card(
+                                elevation: 10,
+                                color: Colors.white,
+                                child: Padding(
+                                    padding: EdgeInsets.all(3),
+                                    child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          SizedBox(
+                                            height: 3,
+                                          ),
+                                          Text(
+                                            'Trips Overview',
+                                            style: TextStyle(
+                                                fontSize: 25,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                          Text(DateFormat.yMMMEd()
+                                              .format(DateTime.now())),
+                                          SizedBox(
+                                            height: 3,
+                                          ),
+                                          SizedBox(
+                                            height: 150,
+                                          ),
+                                          Center(
+                                            child: Text(
+                                              "Retrieving Trip Data",
                                               style: TextStyle(
+                                                  fontSize: 20,
                                                   fontWeight: FontWeight.bold),
                                             ),
-                                            SizedBox(
-                                              height: 20,
-                                            ),
-                                            Text(
-                                              "All rights reserved © 2022 cogniphi.com",
-                                              style: TextStyle(
-                                                color: Color(0xFF848282),
-                                              ),
-                                            )
-                                          ],
-                                        ))),
-                              ),
-                        // totalEvents.isEmpty
-                        //     ? Padding(
-                        //         padding: EdgeInsets.only(
-                        //             top: 5.0, left: 5, right: 5),
-                        //         child: Card(
-                        //             elevation: 10,
-                        //             color: Colors.white,
-                        //             child: Padding(
-                        //                 padding: EdgeInsets.all(3),
-                        //                 child: Column(
-                        //                     mainAxisAlignment:
-                        //                         MainAxisAlignment.start,
-                        //                     children: [
-                        //                       SizedBox(
-                        //                         height: 3,
-                        //                       ),
-                        //                       Text(
-                        //                         'Events',
-                        //                         style: TextStyle(
-                        //                             fontSize: 25,
-                        //                             fontWeight:
-                        //                                 FontWeight.w500),
-                        //                       ),
-                        //                       SizedBox(
-                        //                         height: 150,
-                        //                       ),
-                        //                       Center(
-                        //                         child: Text(
-                        //                           "Retrieving Event Data",
-                        //                           style: TextStyle(
-                        //                               fontSize: 20,
-                        //                               fontWeight:
-                        //                                   FontWeight.bold),
-                        //                         ),
-                        //                       ),
-                        //                       SizedBox(
-                        //                         height: 150,
-                        //                       ),
-                        //                     ]))))
-                        //     : Padding(
-                        //         padding: EdgeInsets.only(
-                        //             top: 5.0, left: 5, right: 5),
-                        //         child: Card(
-                        //             elevation: 10,
-                        //             color: Colors.white,
-                        //             child: Padding(
-                        //                 padding: EdgeInsets.all(3),
-                        //                 child: Column(
-                        //                   mainAxisAlignment:
-                        //                       MainAxisAlignment.start,
-                        //                   children: [
-                        //                     SizedBox(
-                        //                       height: 3,
-                        //                     ),
-                        //                     Text(
-                        //                       'Events',
-                        //                       style: TextStyle(
-                        //                           fontSize: 25,
-                        //                           fontWeight: FontWeight.w500),
-                        //                     ),
-                        //                     SizedBox(
-                        //                       height: 5,
-                        //                     ),
-                        //                     Text(
-                        //                       "Total Event:${totalEvents.length}",
-                        //                       style: TextStyle(
-                        //                           fontWeight: FontWeight.bold),
-                        //                     ),
-                        //                     GestureDetector(
-                        //                       onTap: () async {
-                        //                         // Navigator.push(
-                        //                         //   context,
-                        //                         //   MaterialPageRoute(
-                        //                         //       builder: (context) =>
-                        //                         //           ScreenEvents()),
-                        //                         // );
-                        //                       },
-                        //                       child: Container(
-                        //                         width: 450,
-                        //                         height: 350,
-                        //                         child: multibar(),
-                        //                       ),
-                        //                     ),
-                        //                   ],
-                        //                 ))),
-                        //       ),
-                      ])))));
+                                          ),
+                                          SizedBox(
+                                            height: 150,
+                                          ),
+                                        ]))))
+                        : Padding(
+                            padding:
+                                EdgeInsets.only(top: 5.0, left: 5, right: 5),
+                            child: Card(
+                                elevation: 10,
+                                color: Colors.white,
+                                child: Padding(
+                                    padding: EdgeInsets.all(3),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: [
+                                        SizedBox(
+                                          height: 3,
+                                        ),
+                                        Text(
+                                          'Trips Overview',
+                                          style: TextStyle(
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                        SizedBox(
+                                          height: 5,
+                                        ),
+                                        Text(DateFormat.yMMMEd()
+                                            .format(DateTime.now())),
+                                        SizedBox(
+                                          height: 3,
+                                        ),
+                                        Container(
+                                            width: 450,
+                                            height: 350,
+                                            child: stackedColumn(
+                                              dashtripList: _dashtripList,
+                                              completed: _completed,
+                                              planned: _planned,
+                                              unplanned: _unplanned,
+                                            )),
+                                        Text(
+                                          "Total Trips:${total_trips}",
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        Text(
+                                          "All rights reserved © ${DateTime.now().year} cogniphi.com",
+                                          style: TextStyle(
+                                            color: Color(0xFF848282),
+                                          ),
+                                        )
+                                      ],
+                                    ))),
+                          ),
+                    // totalEvents.isEmpty
+                    //     ? Padding(
+                    //         padding: EdgeInsets.only(
+                    //             top: 5.0, left: 5, right: 5),
+                    //         child: Card(
+                    //             elevation: 10,
+                    //             color: Colors.white,
+                    //             child: Padding(
+                    //                 padding: EdgeInsets.all(3),
+                    //                 child: Column(
+                    //                     mainAxisAlignment:
+                    //                         MainAxisAlignment.start,
+                    //                     children: [
+                    //                       SizedBox(
+                    //                         height: 3,
+                    //                       ),
+                    //                       Text(
+                    //                         'Events',
+                    //                         style: TextStyle(
+                    //                             fontSize: 25,
+                    //                             fontWeight:
+                    //                                 FontWeight.w500),
+                    //                       ),
+                    //                       SizedBox(
+                    //                         height: 150,
+                    //                       ),
+                    //                       Center(
+                    //                         child: Text(
+                    //                           "Retrieving Event Data",
+                    //                           style: TextStyle(
+                    //                               fontSize: 20,
+                    //                               fontWeight:
+                    //                                   FontWeight.bold),
+                    //                         ),
+                    //                       ),
+                    //                       SizedBox(
+                    //                         height: 150,
+                    //                       ),
+                    //                     ]))))
+                    //     : Padding(
+                    //         padding: EdgeInsets.only(
+                    //             top: 5.0, left: 5, right: 5),
+                    //         child: Card(
+                    //             elevation: 10,
+                    //             color: Colors.white,
+                    //             child: Padding(
+                    //                 padding: EdgeInsets.all(3),
+                    //                 child: Column(
+                    //                   mainAxisAlignment:
+                    //                       MainAxisAlignment.start,
+                    //                   children: [
+                    //                     SizedBox(
+                    //                       height: 3,
+                    //                     ),
+                    //                     Text(
+                    //                       'Events',
+                    //                       style: TextStyle(
+                    //                           fontSize: 25,
+                    //                           fontWeight: FontWeight.w500),
+                    //                     ),
+                    //                     SizedBox(
+                    //                       height: 5,
+                    //                     ),
+                    //                     Text(
+                    //                       "Total Event:${totalEvents.length}",
+                    //                       style: TextStyle(
+                    //                           fontWeight: FontWeight.bold),
+                    //                     ),
+                    //                     GestureDetector(
+                    //                       onTap: () async {
+                    //                         // Navigator.push(
+                    //                         //   context,
+                    //                         //   MaterialPageRoute(
+                    //                         //       builder: (context) =>
+                    //                         //           ScreenEvents()),
+                    //                         // );
+                    //                       },
+                    //                       child: Container(
+                    //                         width: 450,
+                    //                         height: 350,
+                    //                         child: multibar(),
+                    //                       ),
+                    //                     ),
+                    //                   ],
+                    //                 ))),
+                    //       ),
+                  ]))));
   }
 
   @override

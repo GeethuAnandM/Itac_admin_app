@@ -353,7 +353,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 16,
                 ),
                 Text(
-                  "All rights reserved © 2022 cogniphi.com",
+                 "All rights reserved © ${DateTime.now().year} cogniphi.com",
                   style: TextStyle(
                     color: Color(0xFF848282),
                   ),

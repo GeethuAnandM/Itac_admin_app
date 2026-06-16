@@ -1051,7 +1051,8 @@ class _manageTripScreenState extends State<manageTripScreen> {
                                                           if (dataOfTripsList[index]["tripStatus"] ==
                                                               "Default") {
                                                             if (dataOfTripsList[index]["actualStartTime"].toString() != "--" && dataOfTripsList[index]["actualStartTime"] != null) {
-                                                              startdate = DateFormat("yyyy-MM-dd HH:mm").parse(dataOfTripsList[index]['actualStartTime'].add(const Duration(hours: 5, minutes: 30)) ?? "");
+                                                                startdate = DateFormat("dd-MM-yyyy HH:mm").parse(dataOfTripsList[index]['actualStartTime'])
+                                                                  .add(const Duration(hours: 5, minutes: 30));
                                                               sdate = dateFormat1.format(startdate);
                                                               // print("tripdate:${tripData[index]['onwardActualStartDateTime']}");
                                                               // print("startdate:${startdate}");

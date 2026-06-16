@@ -138,7 +138,8 @@ class _EditTripScreenState extends State<EditTripScreen> {
 
       vehiclenames.clear();
 
-      final url = "${baseUrl}api/list-vehicles/$userId";
+      // final url = "${baseUrl}api/list-vehicles/$userId";
+      final url = "${baseUrl}vehicle/vehicles/$userId";
       final result = await Dio().get(url);
 
       if (result.statusCode == 200 && result.data is List) {
@@ -509,7 +510,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
       await AddVehicleNames();
       print("returnen:${widget.returnEndDateTime}");
       tripNameController.text = widget.tripName;
-      if (widget.onwardStartDateTime != null ||
+      if (widget.onwardStartDateTime != null &&
           widget.onwardStartDateTime != "--") {
         startdate = widget.onwardStartDateTime.toString().split(" ")[0];
         starttime = widget.onwardStartDateTime.toString().split(" ")[1];
@@ -595,8 +596,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
 
   Widget build(BuildContext context) {
     print(widget.onwardStartDateTime);
-    return SafeArea(
-        child: Scaffold(
+    return Scaffold(
       key: _key,
       drawer: const NavBar(),
       appBar: PreferredSize(
@@ -1145,21 +1145,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                               context: context,
                                               initialTime: TimeOfDay.now(),
                                             );
-                                            print(newTime);
                                             if (newTime != null) {
-                                              print(newTime);
-                                              DateTime parsedTime =
-                                                  DateFormat.jm().parse(newTime
-                                                      .format(context)
-                                                      .toString());
                                               String formattedTime =
-                                                  DateFormat('HH:mm:ss')
-                                                      .format(parsedTime);
-                                              print(formattedTime);
+                                                  '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00';
                                               setState(() {
                                                 onwardStartTimeController.text =
                                                     formattedTime;
-                                                print(newTime);
                                               });
                                             }
                                           },
@@ -1455,21 +1446,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                         context: context,
                                         initialTime: TimeOfDay.now(),
                                       );
-                                      print(newTime);
                                       if (newTime != null) {
-                                        print(newTime);
-                                        DateTime parsedTime = DateFormat.jm()
-                                            .parse(newTime
-                                                .format(context)
-                                                .toString());
                                         String formattedTime =
-                                            DateFormat('HH:mm:ss')
-                                                .format(parsedTime);
-                                        print(formattedTime);
+                                            '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00';
                                         setState(() {
                                           onwardEndTimeController.text =
                                               formattedTime;
-                                          print(newTime);
                                         });
                                       }
                                     },
@@ -1671,21 +1653,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                               context: context,
                                               initialTime: TimeOfDay.now(),
                                             );
-                                            print(newTime);
                                             if (newTime != null) {
-                                              print(newTime);
-                                              DateTime parsedTime =
-                                                  DateFormat.jm().parse(newTime
-                                                      .format(context)
-                                                      .toString());
                                               String formattedTime =
-                                                  DateFormat('HH:mm:ss')
-                                                      .format(parsedTime);
-                                              print(formattedTime);
+                                                  '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00';
                                               setState(() {
                                                 returnStartTimeController.text =
                                                     formattedTime;
-                                                print(newTime);
                                               });
                                             }
                                           },
@@ -1889,21 +1862,12 @@ class _EditTripScreenState extends State<EditTripScreen> {
                                               context: context,
                                               initialTime: TimeOfDay.now(),
                                             );
-                                            print(newTime);
                                             if (newTime != null) {
-                                              print(newTime);
-                                              DateTime parsedTime =
-                                                  DateFormat.jm().parse(newTime
-                                                      .format(context)
-                                                      .toString());
                                               String formattedTime =
-                                                  DateFormat('HH:mm:ss')
-                                                      .format(parsedTime);
-                                              print(formattedTime);
+                                                  '${newTime.hour.toString().padLeft(2, '0')}:${newTime.minute.toString().padLeft(2, '0')}:00';
                                               setState(() {
                                                 returnEndTimeController.text =
                                                     formattedTime;
-                                                print(newTime);
                                               });
                                             }
                                           },
@@ -2172,7 +2136,7 @@ class _EditTripScreenState extends State<EditTripScreen> {
                 ),
               ),
             ),
-    ));
+    );
   }
 
   @override
