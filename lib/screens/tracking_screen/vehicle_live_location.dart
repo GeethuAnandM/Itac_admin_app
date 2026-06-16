@@ -1068,7 +1068,10 @@ class CreateClusterMapState extends State<CreateClusterMap> {
         if (i["latitude"] != null && i["longitude"] != null) // ← guard here
           Place(
               name: i["vehicleName"] ?? "Unknown",
-              latLng: LatLng(i["latitude"], i["longitude"]))
+              latLng: LatLng(
+                (i["latitude"] as num).toDouble(),
+                (i["longitude"] as num).toDouble(),
+              ))
     ];
     // for (var i in items) {
     //   print("Items: ${i.name}");
