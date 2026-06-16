@@ -462,6 +462,7 @@ class _CreateMapState extends State<CreateMap> {
             textColor: Colors.yellow,
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
             },
           ),
         );
@@ -480,6 +481,7 @@ class _CreateMapState extends State<CreateMap> {
             textColor: Colors.yellow,
             onPressed: () {
               ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).clearSnackBars();
             },
           ),
         );
@@ -500,6 +502,7 @@ class _CreateMapState extends State<CreateMap> {
           textColor: Colors.yellow,
           onPressed: () {
             ScaffoldMessenger.of(context).hideCurrentSnackBar();
+            ScaffoldMessenger.of(context).clearSnackBars();
           },
         ),
       );
@@ -868,10 +871,11 @@ class _CreateMapState extends State<CreateMap> {
                                                   ),
                                                 ),
                                               );
-
+                                              Navigator.pop(ctx);
                                               _formKey.currentState!.validate();
                                               await shareVehiclelocation(
-                                                  ctx, vehicle["vehicleId"]);
+                                                  context,
+                                                  vehicle["vehicleId"]);
                                               _formKey.currentState?.reset();
                                             }
                                           })
@@ -1135,17 +1139,17 @@ class CreateClusterMapState extends State<CreateClusterMap> {
           bottom: 20,
           child: Column(children: [
             Container(
-              height: 30,
-              width: 30,
+              height: 36,
+              width: 36,
               child: FloatingActionButton(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                backgroundColor: Colors.white,
-                child: const Icon(
+                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                child: Icon(
                   Icons.add,
-                  size: 28,
-                  color: Colors.grey,
+                  size: 32,
+                  color: Colors.grey.shade800,
                 ),
                 onPressed: () async {
                   final controller = await _controller.future;
@@ -1156,19 +1160,19 @@ class CreateClusterMapState extends State<CreateClusterMap> {
                 },
               ),
             ),
-            const SizedBox(height: 8), // ← spacer
+            const SizedBox(height: 2), // ← spacer
             Container(
-              height: 30,
-              width: 30,
+              height: 36,
+              width: 36,
               child: FloatingActionButton(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
-                backgroundColor: Colors.white,
-                child: const Icon(
+                backgroundColor: Colors.white.withValues(alpha: 0.7),
+                child: Icon(
                   Icons.remove,
-                  size: 28,
-                  color: Colors.grey,
+                  size: 32,
+                  color: Colors.grey.shade800,
                 ),
                 onPressed: () async {
                   final controller = await _controller.future;
