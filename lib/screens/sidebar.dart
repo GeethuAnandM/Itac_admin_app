@@ -329,24 +329,24 @@ class _NavBarState extends State<NavBar> {
                           )),
                 );
               }),
-          // ListTile(
-          //   leading: Icon(
-          //     Icons.notifications,
-          //     color: blackColor,
-          //   ),
-          //   title: Text(
-          //     translation(context).notification,
-          //     // "Notifications",
-          //     style: TextStyle(fontWeight: FontWeight.w900),
-          //   ),
-          //   onTap: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //           builder: (context) => const NotificationScreen()),
-          //     );
-          //   },
-          // ),
+          ListTile(
+            leading: Icon(
+              Icons.notifications,
+              color: blackColor,
+            ),
+            title: Text(
+              translation(context).notification,
+              // "Notifications",
+              style: TextStyle(fontWeight: FontWeight.w900),
+            ),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const NotificationScreen()),
+              );
+            },
+          ),
           ListTile(
               leading: Icon(
                 Icons.account_circle_rounded,
