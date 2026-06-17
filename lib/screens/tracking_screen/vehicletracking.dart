@@ -263,15 +263,22 @@ class _VehicleTrackingState extends State<VehicleTracking> {
       final response = await Dio().post(trackurl, data: resdata);
       data = response.data['list'];
       for (var i = 0; i < data.length; i++) {
-        polylineCoordinates
-            .add(LatLng(data[i]["lattitude"]!, data[i]["longitude"]!));
-        heading.add(data[i]["heading"]);
+        polylineCoordinates.add(
+          LatLng(
+            (data[i]["lattitude"] as num).toDouble(),
+            (data[i]["longitude"] as num).toDouble(),
+          ),
+        );
+        heading.add((data[i]["heading"] ?? 0).toDouble());
       }
 
-      _initallatitude = data[0]["lattitude"];
-      _initiallongitude = data[0]["longitude"];
-      _destinationlatitude = data[data.length - 1]["lattitude"];
-      _destinationlongitude = data[data.length - 1]["longitude"];
+      _initallatitude = (data[0]["lattitude"] as num).toDouble();
+
+      _initiallongitude = (data[0]["longitude"] as num).toDouble();
+
+      _destinationlatitude = (data.last["lattitude"] as num).toDouble();
+
+      _destinationlongitude = (data.last["longitude"] as num).toDouble();
       _kGooglePlex = CameraPosition(
         target: LatLng(_initallatitude!, _initiallongitude!),
         zoom: zoomlevel,
@@ -325,6 +332,11 @@ class _VehicleTrackingState extends State<VehicleTracking> {
       }
     }
     timer = Timer.periodic(Duration(milliseconds: currentspeed), (_) {
+      if (j >= polylineCoordinates.length) {
+        counter = 0;
+        timer?.cancel();
+        return;
+      }
       // print("inside timer periodic");
       // print(polylineCoordinates.length);
       if (polylineCoordinates.length > 1) {
@@ -344,6 +356,14 @@ class _VehicleTrackingState extends State<VehicleTracking> {
       if (j < polylineCoordinates.length) {
         counter = j;
         // print("inside polyline coordinates");
+        if (markers[markerId] == null) {
+          print("currentLocation marker missing");
+          return;
+        }
+        if (j >= heading.length || j >= data.length) {
+          timer?.cancel();
+          return;
+        }
         markers[markerId] = markers[markerId]!.copyWith(
             positionParam: polylineCoordinates[j],
             rotationParam: heading[j],
@@ -384,6 +404,10 @@ class _VehicleTrackingState extends State<VehicleTracking> {
     timer!.cancel();
     GoogleMapController googleMapController = await _controller.future;
     MarkerId markerId = const MarkerId("currentLocation");
+    if (markers[markerId] == null) {
+      print("currentLocation marker missing");
+      return;
+    }
     markers[markerId] = markers[markerId]!.copyWith(
         positionParam: LatLng(_initallatitude!, _initiallongitude!),
         rotationParam: heading[0]);
