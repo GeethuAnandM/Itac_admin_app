@@ -2,7 +2,7 @@ name: admin_app
 description: A new Flutter project.
 
 publish_to: "none"
-version: 1.0.5
+version: 1.0.5+77
 
 environment:
   sdk: ">=2.18.2 <4.0.0"
@@ -52,6 +52,8 @@ dependencies:
   modal_bottom_sheet:
   wakelock_plus: ^1.2.8
   custom_info_window: ^1.0.1
+  package_info_plus: ^8.0.0
+  url_launcher: ^6.3.0
 
 
 

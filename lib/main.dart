@@ -1,5 +1,6 @@
 import 'package:admin_app/l10n/app_localizations.dart';
 import 'package:admin_app/screens/adminlogin.dart';
+import 'package:admin_app/screens/forceUpdate/app_startup.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -105,36 +106,36 @@ class _AdminAppState extends State<AdminApp> {
         overlays: [SystemUiOverlay.bottom]);
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     return MaterialApp(
-      builder: (context, child) {
-        final mediaQueryData = MediaQuery.of(context);
-        final scale = mediaQueryData.textScaleFactor.clamp(1.0, 1.0);
-        return MediaQuery(
-          child: child!,
-          data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
-        );
-      },
-
-      debugShowCheckedModeBanner: false,
-      theme: themeNotifier.getTheme,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: _locale,
-      home: FutureBuilder(
-          future: checkloggedstats(),
-          builder: (ctx, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasData) {
-                if (snapshot.data == true) {
-                  return Dashboard();
-                } else {
-                  return AdminLogin();
-                  // return Dashboard();
+        builder: (context, child) {
+          final mediaQueryData = MediaQuery.of(context);
+          final scale = mediaQueryData.textScaleFactor.clamp(1.0, 1.0);
+          return MediaQuery(
+            child: child!,
+            data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
+          );
+        },
+        debugShowCheckedModeBanner: false,
+        theme: themeNotifier.getTheme,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: _locale,
+        home: AppStartup(
+          child: FutureBuilder(
+              future: checkloggedstats(),
+              builder: (ctx, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data == true) {
+                      return Dashboard();
+                    } else {
+                      return AdminLogin();
+                      // return Dashboard();
+                    }
+                  }
                 }
-              }
-            }
-            return AdminLogin();
-          }),
-      // Dashboard(),
-    );
+                return AdminLogin();
+              }),
+          // Dashboard(),
+        ));
   }
 }
