@@ -7,11 +7,10 @@ class ForceUpdateDialog extends StatelessWidget {
   final VersionCheckResult result;
 
   // Replace these with your real store URLs when you publish
-  static const String _iosStoreUrl =
-      ''; // e.g. 'https://apps.apple.com/app/id...'
-  static const String _androidStoreUrl =
-      ''; // e.g. 'https://play.google.com/store/apps/details?id=...'
+  static const String _iosStoreUrl = "https://apps.apple.com/app/id6779649890";
 
+  static const String _androidStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.suffix.admin_app';
   const ForceUpdateDialog({super.key, required this.result});
 
   static Future<void> show(BuildContext context, VersionCheckResult result) {

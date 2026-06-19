@@ -12,6 +12,7 @@ import 'screens/color.dart';
 import 'package:admin_app/screens/dashboardScreen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'screens/themenotifier.dart';
+import 'utils/push_notification_service.dart';
 
 var themecolruserselected = "Blue And Indigo";
 var languageuserselected = "English";
@@ -20,6 +21,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var pref = await SharedPreferences.getInstance();
   var themeColor = pref.getString("ThemeMode");
+  await PushNotificationService.initialize();
+  
   print("theme color ${themeColor}");
   if (themeColor == "Indigo And Pink") {
     themecolruserselected = "Indigo And Pink";
