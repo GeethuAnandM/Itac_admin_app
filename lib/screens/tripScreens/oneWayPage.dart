@@ -53,27 +53,59 @@ class _OneWayState extends State<OneWay> {
   bool isrecurringchk = false;
 
   Future<List<dynamic>> getVehiclesDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    var username = prefs.getString("user_id");
-    final url = "${baseUrl}api/list-vehicles/$username";
-    var dio = Dio();
-    final response = await dio.get(url);
-    VehicleList = response.data;
-    allids = [];
-    for (var i in VehicleList) {
-      if (i['deviceId'] != null && i['deviceId'] != "") {
-        allids.add(i['deviceId']);
-      }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString("user_id");
+      final url = "${baseUrl}vehicle/vehicles/$userId";
+      print("Calling getVehiclesDetails: $url");
+      print("baseUrl = $baseUrl");
+      print("user_id = $userId");
+      print("url = $url");
+      final response = await dio.get(url);
+      VehicleList = response.data;
+      return VehicleList;
+    } on DioError catch (e) {
+      print("Vehicle API Error");
+      print(e.response?.statusCode);
+      print(e.response?.data);
+
+      setState(() {
+        Isloading = false;
+      });
+      return [];
     }
-    return VehicleList;
   }
 
   Future<List<dynamic>> getDeviceCurrentLocation() async {
-    var data = {"deviceIds": allids};
-    final url2 = "${baseUrl}location/getDeviceCurrentLocation";
-    final response = await dio.post(url2, data: data);
-    DeviceList = await response.data;
-    return DeviceList;
+    if (allids.isEmpty) {
+      print("No device ids found");
+      return [];
+    }
+
+    try {
+      var data = {
+        "deviceIds": allids,
+      };
+
+      print(data);
+
+      final url2 = "${baseUrl}location/getDeviceCurrentLocation";
+
+      final response = await dio.post(
+        url2,
+        data: data,
+      );
+
+      DeviceList = response.data;
+
+      return DeviceList;
+    } on DioError catch (e) {
+      print("Location API Error");
+      print(e.response?.statusCode);
+      print(e.response?.data);
+
+      return [];
+    }
   }
 
   List<Widget> AddVehicleNames() {
@@ -197,7 +229,7 @@ class _OneWayState extends State<OneWay> {
     var userId = prefs.getString("user_id");
     print("userid:${userId}");
     var orgId = prefs.getString("org_id");
-    final url = "$baseUrl:11022/api/list-driver/$orgId";
+    final url = "${baseUrl}api/list-driver/$orgId";
     var dio = Dio();
     final response = await dio.get(url);
     print("reschk${response.data}");
@@ -257,16 +289,22 @@ class _OneWayState extends State<OneWay> {
     print(
         "$vehicleName,$tripName,$recurring,${drivernames},$enddate,$onwardstartdate,$onwardstarttime,$onwardendtime,$onwardenddata");
     var data;
-    DateTime onwardStartTimeformat = DateFormat("HH:mm").parse(onwardstarttime).subtract(const Duration(hours: 5,minutes: 30));
-    DateTime onwardendtimeformat = DateFormat("HH:mm").parse(onwardendtime).subtract(const Duration(hours: 5,minutes: 30));
+    DateTime onwardStartTimeformat = DateFormat("HH:mm")
+        .parse(onwardstarttime)
+        .subtract(const Duration(hours: 5, minutes: 30));
+    DateTime onwardendtimeformat = DateFormat("HH:mm")
+        .parse(onwardendtime)
+        .subtract(const Duration(hours: 5, minutes: 30));
     if (recurring == false) {
       data = {
         "isRecurring": recurring,
         "category": "One Way",
         "onwardEndDate": onwardenddata,
-        "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+        "onwardEndTime":
+            DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
         "onwardStartDate": onwardstartdate,
-        "onwardStartTime": DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+        "onwardStartTime":
+            DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
         "orgId": int.parse(orgId!),
         "vehicleId":
             vehicleNameselected == null ? null : vehicleNameselected?.id,
@@ -285,9 +323,11 @@ class _OneWayState extends State<OneWay> {
           "category": "One Way",
           "endDate": enddate,
           "onwardEndDate": onwardenddata,
-          "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+          "onwardEndTime":
+              DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
           "onwardStartDate": onwardstartdate,
-          "onwardStartTime":  DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+          "onwardStartTime":
+              DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
           "orgId": int.parse(orgId!),
           "vehicleId":
               vehicleNameselected == null ? null : vehicleNameselected?.id,
@@ -316,10 +356,7 @@ class _OneWayState extends State<OneWay> {
       if (response.statusCode == 200) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (context) => manageTripScreen(
-
-                  )),
+          MaterialPageRoute(builder: (context) => manageTripScreen()),
         );
       }
     } on DioError catch (e) {
@@ -331,8 +368,7 @@ class _OneWayState extends State<OneWay> {
       } else if (e.response?.statusCode == 500) {
         showSnackBar(context, "Server Error");
       }
-    }
-    catch(e){
+    } catch (e) {
       print(e);
       print("in catch error");
     }
@@ -380,7 +416,7 @@ class _OneWayState extends State<OneWay> {
     //     themeColor= pref.getString("ThemeMode");
     //   });
     // });
-    for(var i=0;i<_totTrip.length;i++){
+    for (var i = 0; i < _totTrip.length; i++) {
       print(" _tottrip data ${_totTrip[i].name}");
     }
     print(themecolruserselected);
@@ -1142,19 +1178,18 @@ class _OneWayState extends State<OneWay> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
                                 child: DropdownSearch<VehicleDrop>(
-                                  compareFn: (item1, item2) => item1.id == item2.id,
-                                  decoratorProps:
-                                      const DropDownDecoratorProps(
-                                          decoration:
-                                              InputDecoration(
-                                                  hintText:
-                                                      'Select Vehicle Name')),
+                                  compareFn: (item1, item2) =>
+                                      item1.id == item2.id,
+                                  decoratorProps: const DropDownDecoratorProps(
+                                      decoration: InputDecoration(
+                                          hintText: 'Select Vehicle Name')),
                                   popupProps: PopupProps.bottomSheet(
                                       searchFieldProps: TextFieldProps(
                                           decoration: InputDecoration(
                                               hintText: "Select Vehicle Name")),
                                       showSearchBox: true),
-                                  items: (filter, loadProps) => filterdata(filter),
+                                  items: (filter, loadProps) =>
+                                      filterdata(filter),
                                   // asyncItems: (String filter) =>
                                   //     filterdata(filter),
                                   onSelected: (VehicleDrop? data) async {
@@ -1242,13 +1277,13 @@ class _OneWayState extends State<OneWay> {
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10))),
                                       child: DropdownSearch<Trips>(
-                                        compareFn: (item1, item2) => item1.id == item2.id,
+                                        compareFn: (item1, item2) =>
+                                            item1.id == item2.id,
                                         decoratorProps:
                                             const DropDownDecoratorProps(
-                                                decoration:
-                                                    InputDecoration(
-                                                        hintText:
-                                                            'Select Driver Name')),
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        'Select Driver Name')),
                                         popupProps: PopupProps.bottomSheet(
                                             searchFieldProps: TextFieldProps(
                                                 decoration: InputDecoration(
@@ -1256,8 +1291,8 @@ class _OneWayState extends State<OneWay> {
                                                         "Select Driver Name ")),
                                             showSearchBox: true),
                                         items: (filter, loadProps) async {
-    return _totTrip;
-  },
+                                          return _totTrip;
+                                        },
                                         // asyncItems: (String filter) =>
                                         //     filterTrip(filter),
                                         onSelected: (Trips? data) async {
@@ -1361,8 +1396,7 @@ class _OneWayState extends State<OneWay> {
                                     Navigator.of(context)
                                         .push(MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          manageTripScreen(
-                                      ),
+                                          manageTripScreen(),
                                     ));
                                     //   // (route) => false,
                                     // );
@@ -1421,8 +1455,7 @@ class VehicleDrop {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is VehicleDrop && other.id == id;
+      identical(this, other) || other is VehicleDrop && other.id == id;
 
   @override
   int get hashCode => id.hashCode;
@@ -1439,8 +1472,7 @@ class Trips {
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is Trips && other.id == id;
+      identical(this, other) || other is Trips && other.id == id;
 
   @override
   int get hashCode => id.hashCode;

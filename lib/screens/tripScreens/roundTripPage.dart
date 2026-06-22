@@ -33,27 +33,59 @@ class _RoundTripState extends State<RoundTrip> {
   bool isDriverName = false;
 
   Future<List<dynamic>> getVehiclesDetails() async {
-    final prefs = await SharedPreferences.getInstance();
-    var userId = prefs.getString("user_id");
-    final url = "${baseUrl}api/list-vehicles/$userId";
-    var dio = Dio();
-    final response = await dio.get(url);
-    VehicleList = response.data;
-    allids = [];
-    for (var i in VehicleList) {
-      if (i['deviceId'] != null && i['deviceId'] != "") {
-        allids.add(i['deviceId']);
-      }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      var userId = prefs.getString("user_id");
+      final url = "${baseUrl}vehicle/vehicles/$userId";
+      print("Calling getVehiclesDetails: $url");
+      print("baseUrl = $baseUrl");
+      print("user_id = $userId");
+      print("url = $url");
+      final response = await dio.get(url);
+      VehicleList = response.data;
+      return VehicleList;
+    } on DioError catch (e) {
+      print("Vehicle API Error");
+      print(e.response?.statusCode);
+      print(e.response?.data);
+
+      setState(() {
+        Isloading = false;
+      });
+      return [];
     }
-    return VehicleList;
   }
 
   Future<List<dynamic>> getDeviceCurrentLocation() async {
-    var data = {"deviceIds": allids};
-    const url2 = "${baseUrl}location/getDeviceCurrentLocation";
-    final response = await dio.post(url2, data: data);
-    DeviceList = await response.data;
-    return DeviceList;
+    if (allids.isEmpty) {
+      print("No device ids found");
+      return [];
+    }
+
+    try {
+      var data = {
+        "deviceIds": allids,
+      };
+
+      print(data);
+
+      final url2 = "${baseUrl}location/getDeviceCurrentLocation";
+
+      final response = await dio.post(
+        url2,
+        data: data,
+      );
+
+      DeviceList = response.data;
+
+      return DeviceList;
+    } on DioError catch (e) {
+      print("Location API Error");
+      print(e.response?.statusCode);
+      print(e.response?.data);
+
+      return [];
+    }
   }
 
   List<Widget> AddVehicleNames() {
@@ -238,23 +270,35 @@ class _RoundTripState extends State<RoundTrip> {
     print(
         "$vehicleName,$tripName,$recurring,${drivernames},$enddate,$onwardstartdate,$onwardstarttime,$onwardendtime,$onwardenddata");
     var data;
-    DateTime onwardStartTimeformat = DateFormat("HH:mm").parse(onwardstarttime).subtract(const Duration(hours: 5,minutes: 30));
-    DateTime onwardendtimeformat = DateFormat("HH:mm").parse(onwardendtime).subtract(const Duration(hours: 5,minutes: 30));
-    DateTime returnstarttimeformat = DateFormat("HH:mm").parse(returnstarttime).subtract(const Duration(hours: 5,minutes: 30));
-    DateTime returnendtimeformat = DateFormat("HH:mm").parse(returnendtime).subtract(const Duration(hours: 5,minutes: 30));
+    DateTime onwardStartTimeformat = DateFormat("HH:mm")
+        .parse(onwardstarttime)
+        .subtract(const Duration(hours: 5, minutes: 30));
+    DateTime onwardendtimeformat = DateFormat("HH:mm")
+        .parse(onwardendtime)
+        .subtract(const Duration(hours: 5, minutes: 30));
+    DateTime returnstarttimeformat = DateFormat("HH:mm")
+        .parse(returnstarttime)
+        .subtract(const Duration(hours: 5, minutes: 30));
+    DateTime returnendtimeformat = DateFormat("HH:mm")
+        .parse(returnendtime)
+        .subtract(const Duration(hours: 5, minutes: 30));
     if (recurring == false) {
       data = {
         "isRecurring": recurring,
         "category": "Round",
         // "endDate": enddate,
         "onwardEndDate": onwardenddata,
-        "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+        "onwardEndTime":
+            DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
         "onwardStartDate": onwardstartdate,
-        "onwardStartTime": DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+        "onwardStartTime":
+            DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
         "returnStartDate": returnstartdate,
-        "returnStartTime":DateFormat("HH:mm").format(returnstarttimeformat) + ":00" ,
+        "returnStartTime":
+            DateFormat("HH:mm").format(returnstarttimeformat) + ":00",
         "returnEndDate": returnenddate,
-        "returnEndTime": DateFormat("HH:mm").format(returnendtimeformat) + ":00",
+        "returnEndTime":
+            DateFormat("HH:mm").format(returnendtimeformat) + ":00",
         "orgId": int.parse(orgId!),
         "vehicleId":
             vehicleNameselected == null ? null : vehicleNameselected?.id,
@@ -273,15 +317,20 @@ class _RoundTripState extends State<RoundTrip> {
           "category": "Round",
           "endDate": enddate,
           "onwardEndDate": onwardenddata,
-          "onwardEndTime": DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
+          "onwardEndTime":
+              DateFormat("HH:mm").format(onwardendtimeformat) + ":00",
           "onwardStartDate": onwardstartdate,
-          "onwardStartTime":DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
+          "onwardStartTime":
+              DateFormat("HH:mm").format(onwardStartTimeformat) + ":00",
           "returnStartDate": returnstartdate,
-          "returnStartTime": DateFormat("HH:mm").format(returnstarttimeformat) + ":00" ,
+          "returnStartTime":
+              DateFormat("HH:mm").format(returnstarttimeformat) + ":00",
           "returnEndDate": returnenddate,
-          "returnEndTime": DateFormat("HH:mm").format(returnendtimeformat) + ":00",
+          "returnEndTime":
+              DateFormat("HH:mm").format(returnendtimeformat) + ":00",
           "orgId": int.parse(orgId!),
-          "vehicleId": vehicleNameselected == null ? null : vehicleNameselected?.id,
+          "vehicleId":
+              vehicleNameselected == null ? null : vehicleNameselected?.id,
           "driverId": drivernames == null ? null : drivernames?.id,
           "status": "Not Started",
           "tripName": tripName
@@ -1889,19 +1938,18 @@ class _RoundTripState extends State<RoundTrip> {
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
                                 child: DropdownSearch<VehicleDrop>(
-                                  compareFn: (item1, item2) => item1.id == item2.id,
-                                  decoratorProps:
-                                      const DropDownDecoratorProps(
-                                          decoration:
-                                              InputDecoration(
-                                                  hintText:
-                                                      'Select Vehicle Name')),
+                                  compareFn: (item1, item2) =>
+                                      item1.id == item2.id,
+                                  decoratorProps: const DropDownDecoratorProps(
+                                      decoration: InputDecoration(
+                                          hintText: 'Select Vehicle Name')),
                                   popupProps: PopupProps.bottomSheet(
                                       searchFieldProps: TextFieldProps(
                                           decoration: InputDecoration(
                                               hintText: "Select Vehicle Name")),
                                       showSearchBox: true),
-                                  items: (filter, loadProps) => filterdata(filter),
+                                  items: (filter, loadProps) =>
+                                      filterdata(filter),
                                   // asyncItems: (String filter) =>
                                   //     filterdata(filter),
                                   onSelected: (VehicleDrop? data) async {
@@ -2060,13 +2108,13 @@ class _RoundTripState extends State<RoundTrip> {
                                       //   }).toList(),
                                       // ),
                                       child: DropdownSearch<Trips>(
-                                        compareFn: (item1, item2) => item1.id == item2.id,
+                                        compareFn: (item1, item2) =>
+                                            item1.id == item2.id,
                                         decoratorProps:
                                             const DropDownDecoratorProps(
-                                                decoration:
-                                                    InputDecoration(
-                                                        hintText:
-                                                            'Select Driver Name')),
+                                                decoration: InputDecoration(
+                                                    hintText:
+                                                        'Select Driver Name')),
                                         popupProps: PopupProps.bottomSheet(
                                             searchFieldProps: TextFieldProps(
                                                 decoration: InputDecoration(
@@ -2074,8 +2122,8 @@ class _RoundTripState extends State<RoundTrip> {
                                                         "Select Driver Name")),
                                             showSearchBox: true),
                                         items: (filter, loadProps) async {
-    return totTrip;
-  },
+                                          return totTrip;
+                                        },
                                         // asyncItems: (String filter) =>
                                         //     filterTrip(filter),
                                         onSelected: (Trips? data) async {
