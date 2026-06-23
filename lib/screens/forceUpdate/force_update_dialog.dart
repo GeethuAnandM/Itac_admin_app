@@ -8,6 +8,7 @@ class ForceUpdateDialog extends StatelessWidget {
 
   // Replace these with your real store URLs when you publish
   static const String _iosStoreUrl = "https://apps.apple.com/app/id6779649890";
+  static const String _iosTestflightUrl = "itms-beta://";
 
   static const String _androidStoreUrl =
       'https://play.google.com/store/apps/details?id=com.suffix.admin_app';

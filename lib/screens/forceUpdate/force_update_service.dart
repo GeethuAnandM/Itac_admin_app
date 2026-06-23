@@ -58,11 +58,11 @@ class ForceUpdateService {
       dio.options.receiveTimeout = 5000; // 5 seconds
 
       final response = await dio.get(
-        _baseVersionUrlMock,
-        // queryParameters: {
-        //   'platform': platform,
-        //   'appType': _appType,
-        // },
+        _baseVersionUrl,
+        queryParameters: {
+          'platform': platform,
+          'appType': _appType,
+        },
       );
 
       // Response structure:
@@ -87,7 +87,7 @@ class ForceUpdateService {
         // Force update if server flag is true OR current build is below minimum
         final isBehind = currentVersionCode < result.minSupportedVersionCode;
 
-        if (result.forceUpdate || isBehind) {
+        if (isBehind) {
           print('ForceUpdate: update required!');
           return result;
         }

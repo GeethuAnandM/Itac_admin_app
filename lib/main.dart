@@ -13,6 +13,7 @@ import 'package:admin_app/screens/dashboardScreen.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'screens/themenotifier.dart';
 import 'utils/push_notification_service.dart';
+import 'utils/gcm_service.dart';
 
 var themecolruserselected = "Blue And Indigo";
 var languageuserselected = "English";
@@ -22,7 +23,7 @@ void main() async {
   var pref = await SharedPreferences.getInstance();
   var themeColor = pref.getString("ThemeMode");
   await PushNotificationService.initialize();
-  
+
   print("theme color ${themeColor}");
   if (themeColor == "Indigo And Pink") {
     themecolruserselected = "Indigo And Pink";
@@ -96,9 +97,28 @@ class _AdminAppState extends State<AdminApp> {
     final prefs = await SharedPreferences.getInstance();
     bool status = prefs.getBool("status") ?? false;
     print("status:${prefs.getBool("status")}");
+
     if (status == false) {
       return false;
     } else {
+      // ✅ NEW — User is auto-logging in via cached session, call GCM service
+      final String? userIdStr = prefs.getString('user_id');
+      print('🔄 Auto-login detected. Cached user_id: $userIdStr');
+
+      if (userIdStr != null && userIdStr.isNotEmpty) {
+        final int? userId = int.tryParse(userIdStr);
+        if (userId != null) {
+          print(
+              '📤 Auto-login: Triggering GCM saveGcmDetails for userId: $userId');
+          await GcmService.saveGcmDetails(userId: userId);
+        } else {
+          print('⚠️ Auto-login: Could not parse user_id to int: $userIdStr');
+        }
+      } else {
+        print(
+            '⚠️ Auto-login: user_id not found in SharedPreferences, skipping GCM call');
+      }
+
       return true;
     }
   }

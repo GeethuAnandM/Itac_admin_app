@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Background message handler — MUST be a top-level function (not inside a class)
 @pragma('vm:entry-point')
@@ -109,6 +110,20 @@ class PushNotificationService {
       final fcmToken = await _messaging.getToken();
       print('🔑 FCM Token: $fcmToken');
       // ↑ Copy this token from your console to send test notifications
+      // Inside _getToken(), after: final fcmToken = await _messaging.getToken();
+      final prefs = await SharedPreferences.getInstance();
+      if (fcmToken != null) {
+        await prefs.setString('fcm_token', fcmToken);
+        print('✅ FCM Token cached in SharedPreferences: $fcmToken');
+      }
+
+// Also update on refresh:
+      _messaging.onTokenRefresh.listen((newToken) async {
+        print('🔄 FCM Token refreshed: $newToken');
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('fcm_token', newToken);
+        print('✅ Refreshed FCM Token cached: $newToken');
+      });
 
       // Listen for token refresh
       _messaging.onTokenRefresh.listen((newToken) {

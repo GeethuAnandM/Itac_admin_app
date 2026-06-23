@@ -11,6 +11,7 @@ import 'custom_widget.dart';
 import 'dashboardScreen.dart';
 import 'forgotpassword.dart';
 import "package:admin_app/api/api.dart";
+import 'package:admin_app/utils/gcm_service.dart';
 
 GlobalKey<FormState> LoginFormKey = GlobalKey<FormState>();
 var message = "";
@@ -71,6 +72,12 @@ class _AdminLoginState extends State<AdminLogin> {
           await prefs.setString('user_id', response.data['user_id'].toString());
           var userId = prefs.getString("user_id");
           print("user is strored is $userId");
+
+          await prefs.setString('user_id', response.data['user_id'].toString());
+          final int userIdInt = response.data['user_id']; // ← get as int
+          // ✅ NEW — Save GCM token to backend
+          await GcmService.saveGcmDetails(userId: userIdInt);
+
           if (_isChecked == true) {
             await prefs.setBool('status', true);
             print(response.data['org_ids'][0]);
@@ -84,6 +91,7 @@ class _AdminLoginState extends State<AdminLogin> {
                 key: "temp_org_ids",
                 value: response.data['org_ids'][0].toString());
           }
+
           return "Successfully logged in";
         } else {
           setState(() {
