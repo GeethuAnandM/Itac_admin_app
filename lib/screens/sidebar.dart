@@ -21,6 +21,7 @@ import 'tripScreens/managetripscreen.dart';
 import 'managevehiclescreen.dart';
 import 'themenotifier.dart';
 import 'dashboardScreen.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -32,6 +33,7 @@ class NavBar extends StatefulWidget {
 class _NavBarState extends State<NavBar> {
   final storage = FlutterSecureStorage();
   String _selectedColor = themecolruserselected;
+  String appVersion = "";
 
   List<String> _colors = [
     "Blue And Indigo",
@@ -186,238 +188,273 @@ class _NavBarState extends State<NavBar> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    getAppVersion();
+  }
+
+  Future<void> getAppVersion() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+
+    setState(() {
+      appVersion =
+          "Version ${packageInfo.version} (${packageInfo.buildNumber})";
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     themeNotifier.getTheme;
     return Drawer(
-      child: ListView(
-        padding: EdgeInsets.zero,
+      child: Column(
         children: [
-          UserAccountsDrawerHeader(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-            ),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                child: Image.asset(
-                  'images/adminimage3.png',
-                  width: 60,
-                  height: 120,
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                UserAccountsDrawerHeader(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                  currentAccountPicture: CircleAvatar(
+                    child: ClipOval(
+                      child: Image.asset(
+                        'images/adminimage3.png',
+                        width: 60,
+                        height: 120,
+                      ),
+                    ),
+                    // backgroundColor: Colors.transparent,
+                  ),
+                  accountName: null,
+                  accountEmail: null,
                 ),
-              ),
-              // backgroundColor: Colors.transparent,
-            ),
-            accountName: null,
-            accountEmail: null,
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.dashboard,
-              color: blackColor,
-            ),
-            title: Text(
-              translation(context).dashBoard,
-              // "Dashboard",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Dashboard()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.trending_up,
-              color: blackColor,
-            ),
-            title: Text(
-              translation(context).tracking,
-              // "Tracking",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => TrackTripScreen()),
-              );
-            },
-          ),
-          ListTile(
-              leading: Icon(
-                Icons.trip_origin,
-                color: blackColor,
-              ),
-              title: Text(
-                translation(context).trips,
-                // "Trips",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => manageTripScreen()),
-                );
-              }),
-          ListTile(
-              leading: Icon(
-                Icons.directions_bus,
-                color: blackColor,
-              ),
-              title: Text(
-                translation(context).vehicles,
-                // "Vehicles",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              trailing: loader ? CircularProgressIndicator() : Text(""),
-              onTap: () async {
-                final vehicledetails = await getVehiclesDetails();
-                final devicedetails = await getDeviceCurrentLocation();
-                print(
-                    "devicedetails device passing to apge lenght iss passing is: ${devicedetails.length}");
-                print(
-                    "vehLocationList lenght iss passing is: ${devicedetails}");
-
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ManageVehicleScreen(
-                            vehicleList: vehicledetails,
-                            deviceLocationList: devicedetails,
-                          )),
-                );
-              }),
-          ListTile(
-              leading: Icon(
-                Icons.person,
-                color: blackColor,
-              ),
-              title: Text(
-                translation(context).driver,
-                // "Driver",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ManageDriverScreen()),
-                );
-              }),
-          ListTile(
-              title: Text(
-                translation(context).reports,
-                // "Reports",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              leading: Icon(
-                Icons.report,
-                color: blackColor,
-              ),
-              trailing:
-                  reportspageclicked ? CircularProgressIndicator() : Text(""),
-              onTap: () async {
-                setState(() {
-                  reportspageclicked = true;
-                });
-                await getVehiclesNames();
-
-                // await getVehiclesDetails();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ReportsScreen(
-                            vehicleList: vehicleNames,
-                            vehicleDetailslist: vehicleList,
-                          )),
-                );
-              }),
-          ListTile(
-            leading: Icon(
-              Icons.notifications,
-              color: blackColor,
-            ),
-            title: Text(
-              translation(context).notification,
-              // "Notifications",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const NotificationScreen()),
-              );
-            },
-          ),
-          ListTile(
-              leading: Icon(
-                Icons.account_circle_rounded,
-                color: blackColor,
-              ),
-              title: Text(
-                translation(context).profile,
-                // "Profile",
-                style: TextStyle(fontWeight: FontWeight.w900),
-              ),
-              onTap: () async {
-                await profileInfo();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ProfileScreen(
-                            profileInformation: profileInformation,
-                          )),
-                );
-              }),
-          ListTile(
-            leading: Icon(
-              Icons.format_paint_sharp,
-              color: blackColor,
-            ),
-            title: Text(
-              translation(context).theme,
-              // "Theme",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            onTap: () => themeChangeDialog(themeNotifier),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.language_rounded,
-              color: blackColor,
-            ),
-            title: Text(
-              translation(context).language,
-              // "Language",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            onTap: () => LanguageChangeDialog(),
-          ),
-          ListTile(
-            title: Text(
-              translation(context).logout,
-              // "Logout",
-              style: TextStyle(fontWeight: FontWeight.w900),
-            ),
-            leading: Icon(
-              Icons.exit_to_app,
-              color: blackColor,
-            ),
-            onTap: () async {
-              final prefs = await SharedPreferences.getInstance();
-              //
-              prefs.setBool("status", false);
-              // await prefs.clear();
-              // await storage.deleteAll();
-
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (BuildContext context) => AdminLogin(),
+                ListTile(
+                  leading: Icon(
+                    Icons.dashboard,
+                    color: blackColor,
+                  ),
+                  title: Text(
+                    translation(context).dashBoard,
+                    // "Dashboard",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  onTap: () => {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Dashboard()),
+                    )
+                  },
                 ),
-                // (route) => false,
-              );
-            },
+                ListTile(
+                  leading: Icon(
+                    Icons.trending_up,
+                    color: blackColor,
+                  ),
+                  title: Text(
+                    translation(context).tracking,
+                    // "Tracking",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => TrackTripScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                    leading: Icon(
+                      Icons.trip_origin,
+                      color: blackColor,
+                    ),
+                    title: Text(
+                      translation(context).trips,
+                      // "Trips",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => manageTripScreen()),
+                      );
+                    }),
+                ListTile(
+                    leading: Icon(
+                      Icons.directions_bus,
+                      color: blackColor,
+                    ),
+                    title: Text(
+                      translation(context).vehicles,
+                      // "Vehicles",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    trailing: loader ? CircularProgressIndicator() : Text(""),
+                    onTap: () async {
+                      final vehicledetails = await getVehiclesDetails();
+                      final devicedetails = await getDeviceCurrentLocation();
+                      print(
+                          "devicedetails device passing to apge lenght iss passing is: ${devicedetails.length}");
+                      print(
+                          "vehLocationList lenght iss passing is: ${devicedetails}");
+      
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ManageVehicleScreen(
+                                  vehicleList: vehicledetails,
+                                  deviceLocationList: devicedetails,
+                                )),
+                      );
+                    }),
+                ListTile(
+                    leading: Icon(
+                      Icons.person,
+                      color: blackColor,
+                    ),
+                    title: Text(
+                      translation(context).driver,
+                      // "Driver",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ManageDriverScreen()),
+                      );
+                    }),
+                ListTile(
+                    title: Text(
+                      translation(context).reports,
+                      // "Reports",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    leading: Icon(
+                      Icons.report,
+                      color: blackColor,
+                    ),
+                    trailing: reportspageclicked
+                        ? CircularProgressIndicator()
+                        : Text(""),
+                    onTap: () async {
+                      setState(() {
+                        reportspageclicked = true;
+                      });
+                      await getVehiclesNames();
+      
+                      // await getVehiclesDetails();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ReportsScreen(
+                                  vehicleList: vehicleNames,
+                                  vehicleDetailslist: vehicleList,
+                                )),
+                      );
+                    }),
+                ListTile(
+                  leading: Icon(
+                    Icons.notifications,
+                    color: blackColor,
+                  ),
+                  title: Text(
+                    translation(context).notification,
+                    // "Notifications",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const NotificationScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                    leading: Icon(
+                      Icons.account_circle_rounded,
+                      color: blackColor,
+                    ),
+                    title: Text(
+                      translation(context).profile,
+                      // "Profile",
+                      style: TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    onTap: () async {
+                      await profileInfo();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreen(
+                                  profileInformation: profileInformation,
+                                )),
+                      );
+                    }),
+                ListTile(
+                  leading: Icon(
+                    Icons.format_paint_sharp,
+                    color: blackColor,
+                  ),
+                  title: Text(
+                    translation(context).theme,
+                    // "Theme",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  onTap: () => themeChangeDialog(themeNotifier),
+                ),
+                ListTile(
+                  leading: Icon(
+                    Icons.language_rounded,
+                    color: blackColor,
+                  ),
+                  title: Text(
+                    translation(context).language,
+                    // "Language",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  onTap: () => LanguageChangeDialog(),
+                ),
+                ListTile(
+                  title: Text(
+                    translation(context).logout,
+                    // "Logout",
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                  leading: Icon(
+                    Icons.exit_to_app,
+                    color: blackColor,
+                  ),
+                  onTap: () async {
+                    final prefs = await SharedPreferences.getInstance();
+                    //
+                    prefs.setBool("status", false);
+                    // await prefs.clear();
+                    // await storage.deleteAll();
+      
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => AdminLogin(),
+                      ),
+                      // (route) => false,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              appVersion,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey.shade700,
+              ),
+            ),
           ),
         ],
       ),
